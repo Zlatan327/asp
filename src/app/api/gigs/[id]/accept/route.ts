@@ -42,7 +42,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           status: 'IN_PROGRESS',
           freelancerId: proposal.freelancerId,
           budget: proposal.bidAmount, // Lock in the agreed bid amount
-          estimatedDuration: proposal.estimatedDays ? `\${proposal.estimatedDays} days` : gig.estimatedDuration
+          estimatedDuration: proposal.estimatedDays ? `${proposal.estimatedDays} days` : gig.estimatedDuration
         }
       })
     ]);

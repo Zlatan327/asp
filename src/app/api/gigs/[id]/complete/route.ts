@@ -18,19 +18,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       include: { tasks: true }
     });
 
-    if (!gig || gig.clientId !== session.user.id) {
+    if (!gig) {
+      return NextResponse.json({ error: 'Gig not found' }, { status: 404 });
+    }
+    if (gig.clientId !== session.user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
-    
+    if (gig.status !== 'IN_PROGRESS') {
+      return NextResponse.json({ error: 'Gig must be IN_PROGRESS to complete' }, { status: 400 });
+    }
     if (!gig.freelancerId) {
       return NextResponse.json({ error: 'No freelancer assigned' }, { status: 400 });
     }
-
-    // Mark gig as completed
-    await prisma.gig.update({
-      where: { id },
-      data: { status: 'COMPLETED' }
-    });
 
     // Invoke Reputation Agent
     const metadata = await reputationAgent.calculateScore({
@@ -47,16 +46,27 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     // Convert metadata to a data URI for the SBT (since we don't have an IPFS uploader wired up)
     const tokenURI = "data:application/json;base64," + Buffer.from(JSON.stringify(metadata)).toString('base64');
 
+    // Mark gig as completed now that reputation is calculated
+    await prisma.gig.update({
+      where: { id },
+      data: { status: 'COMPLETED' }
+    });
+
+    const currentRep = await prisma.reputation.findUnique({ where: { userId: gig.freelancerId } });
+    const history = currentRep && currentRep.history ? JSON.parse(currentRep.history as string) : [];
+    history.push(metadata);
+
     // Save score to DB
     await prisma.reputation.upsert({
       where: { userId: gig.freelancerId },
       create: {
         userId: gig.freelancerId,
         overallScore: metadata.overallScore,
-        history: JSON.stringify([metadata])
+        history: JSON.stringify(history)
       },
       update: {
-        overallScore: metadata.overallScore
+        overallScore: metadata.overallScore,
+        history: JSON.stringify(history)
       }
     });
 

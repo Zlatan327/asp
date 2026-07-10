@@ -2,6 +2,10 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 
+const safeParse = (str: string | null | undefined, fallback: any = []) => {
+  try { return str ? JSON.parse(str) : fallback; } catch (e) { return fallback; }
+};
+
 export default async function DashboardPage() {
   const session = await auth();
 
@@ -53,7 +57,7 @@ export default async function DashboardPage() {
             </h1>
             <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
               {user.walletAddress 
-                ? `Connected: \${user.walletAddress.slice(0,6)}...\${user.walletAddress.slice(-4)}` 
+                ? `Connected: ${user.walletAddress.slice(0,6)}...${user.walletAddress.slice(-4)}` 
                 : 'No wallet connected'}
             </p>
           </div>
@@ -85,13 +89,13 @@ export default async function DashboardPage() {
               <div>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: 'var(--space-1)' }}>Credibility Score</div>
                 <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, color: 'var(--color-accent-primary)' }}>
-                  {user.reputationScore?.overallScore.toFixed(0) || 0}
+                  {user.reputationScore?.overallScore != null ? user.reputationScore.overallScore.toFixed(0) : 0}
                 </div>
               </div>
               <div>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: 'var(--space-1)' }}>Total Earned</div>
                 <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, color: 'var(--color-success)' }}>
-                  ${user.freelancerProfile.totalEarned.toFixed(0)}
+                  ${user.freelancerProfile.totalEarned != null ? user.freelancerProfile.totalEarned.toFixed(0) : 0}
                 </div>
               </div>
               <div>
@@ -105,7 +109,7 @@ export default async function DashboardPage() {
             <div>
               <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>Verified Skills</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                {JSON.parse(user.freelancerProfile.skills || '[]').map((skill: any) => (
+                {safeParse(user.freelancerProfile.skills).map((skill: any) => (
                   <span key={skill.name} className="skill-tag">
                     {skill.name} <span style={{ opacity: 0.5, marginLeft: 4 }}>{skill.confidence}%</span>
                   </span>
@@ -124,7 +128,7 @@ export default async function DashboardPage() {
               <div>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: 'var(--space-1)' }}>Total Spent</div>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 800 }}>
-                  ${user.clientProfile.totalSpent.toFixed(0)}
+                  ${user.clientProfile.totalSpent != null ? user.clientProfile.totalSpent.toFixed(0) : 0}
                 </div>
               </div>
               <div>

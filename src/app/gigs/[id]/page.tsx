@@ -20,7 +20,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
   const [useAiDraft, setUseAiDraft] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/gigs/\${unwrappedParams.id}`)
+    fetch(`/api/gigs/${unwrappedParams.id}`)
       .then(res => res.json())
       .then(data => {
         if (data.error) throw new Error(data.error);
@@ -39,7 +39,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
     setSubmitting(true);
 
     try {
-      const res = await fetch(`/api/gigs/\${gig.id}/proposals`, {
+      const res = await fetch(`/api/gigs/${gig.id}/proposals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -65,7 +65,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
   const handleAccept = async (proposalId: string) => {
     if (!confirm('Are you sure you want to hire this freelancer?')) return;
     try {
-      const res = await fetch(`/api/gigs/\${gig.id}/accept`, {
+      const res = await fetch(`/api/gigs/${gig.id}/accept`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ proposalId })
@@ -172,7 +172,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
             {/* Escrow Panel & Workspace Link for In Progress / Accepted gigs */}
             {(gig.status === 'IN_PROGRESS' || gig.status === 'COMPLETED') && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                <button className="btn btn-secondary w-full" onClick={() => router.push(`/gigs/\${gig.id}/workspace`)}>
+                <button className="btn btn-secondary w-full" onClick={() => router.push(`/gigs/${gig.id}/workspace`)}>
                   Go to Active Workspace →
                 </button>
                 <EscrowPanel 

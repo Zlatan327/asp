@@ -1,11 +1,11 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useWallet } from '@/lib/blockchain/wallet';
+import { useWallet } from '@/components/WalletProvider';
 import { SiweMessage } from 'siwe';
 
 export default function LoginPage() {
-  const { connect, address, isConnecting, chainId, signMessage } = useWallet();
+  const { connectWallet, address, isConnecting, chainId, signMessage } = useWallet();
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', position: 'relative' }}>
@@ -74,7 +74,7 @@ export default function LoginPage() {
           <button
             onClick={async () => {
               if (!address) {
-                await connect();
+                await connectWallet();
               } else {
                 try {
                   const nonceRes = await fetch('/api/auth/nonce');

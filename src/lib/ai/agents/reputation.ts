@@ -43,15 +43,15 @@ Output MUST be valid JSON in this exact format:
 }`;
 
   public async calculateScore(input: ReputationInput) {
-    const prompt = `Calculate the reputation score based on this gig performance:
-Freelancer ID: \${input.freelancerId}
-Gig ID: \${input.gigId}
-Client Rating (1-5): \${input.clientRating}
-Client Feedback: "\${input.clientFeedback}"
-Milestones Completed: \${input.milestonesCompleted} / \${input.totalMilestones}
-Was Disputed: \${input.wasDisputed}
-Dispute Winner: \${input.disputeResolvedInFavorOf || 'N/A'}
-Delivered On Time: \${input.deliveredOnTime}`;
+    const prompt = "Calculate the reputation score based on this gig performance:\n" +
+      "Freelancer ID: " + input.freelancerId + "\n" +
+      "Gig ID: " + input.gigId + "\n" +
+      "Client Rating (1-5): " + input.clientRating + "\n" +
+      "Client Feedback: \"" + input.clientFeedback + "\"\n" +
+      "Milestones Completed: " + input.milestonesCompleted + " / " + input.totalMilestones + "\n" +
+      "Was Disputed: " + input.wasDisputed + "\n" +
+      "Dispute Winner: " + (input.disputeResolvedInFavorOf || "N/A") + "\n" +
+      "Delivered On Time: " + input.deliveredOnTime;
 
     return this.executeJson<any>(prompt, { 
       action: 'calculateScore',

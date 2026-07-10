@@ -35,7 +35,7 @@ export default function NewGigPage() {
       if (!res.ok) throw new Error('Failed to create gig');
       
       const gig = await res.json();
-      router.push(`/gigs/\${gig.id}`);
+      router.push(`/gigs/${gig.id}`);
     } catch (err) {
       console.error(err);
       alert('Error creating gig');

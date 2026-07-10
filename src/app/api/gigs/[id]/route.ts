@@ -10,6 +10,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
         client: {
           select: { name: true, avatarUrl: true, clientProfile: true },
         },
+        freelancer: {
+          select: { walletAddress: true, name: true, avatarUrl: true },
+        },
         proposals: {
           include: {
             freelancer: {

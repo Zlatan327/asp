@@ -20,7 +20,7 @@ export abstract class BaseAgent {
 
     try {
       const fullPrompt = context
-        ? `${prompt}\n\nContext Context:\n${JSON.stringify(context, null, 2)}`
+        ? `${prompt}\n\nAdditional Context:\n${JSON.stringify(context, null, 2)}`
         : prompt;
 
       const result = await askJson<T>(this.systemPrompt, fullPrompt);
@@ -50,7 +50,7 @@ export abstract class BaseAgent {
 
     try {
       const fullPrompt = context
-        ? `${prompt}\n\nContext Context:\n${JSON.stringify(context, null, 2)}`
+        ? `${prompt}\n\nAdditional Context:\n${JSON.stringify(context, null, 2)}`
         : prompt;
 
       const result = await ask(this.systemPrompt, fullPrompt);

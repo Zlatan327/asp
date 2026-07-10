@@ -127,10 +127,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return true;
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
+    },
     async session({ session, token }) {
-      if (session.user && session.user.email) {
+      if (token.sub) {
         const dbUser = await prisma.user.findUnique({
-          where: { email: session.user.email },
+          where: { id: token.sub },
           include: {
             freelancerProfile: true,
             clientProfile: true,

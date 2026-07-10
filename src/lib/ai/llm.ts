@@ -28,15 +28,19 @@ function getConfig() {
   const provider = process.env.LLM_PROVIDER || 'openai';
 
   if (provider === 'mimo') {
+    const apiKey = process.env.MIMO_API_KEY;
+    if (!apiKey) throw new Error('MIMO_API_KEY is not set. Please configure it in your .env file.');
     return {
-      apiKey: process.env.MIMO_API_KEY || '',
+      apiKey,
       baseUrl: process.env.MIMO_BASE_URL || 'https://api.xiaomimimo.com/v1',
       model: process.env.MIMO_MODEL || 'mimo-v2.5-pro',
     };
   }
 
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY is not set. Please configure it in your .env file.');
   return {
-    apiKey: process.env.OPENAI_API_KEY || '',
+    apiKey,
     baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
     model: process.env.OPENAI_MODEL || 'gpt-4o',
   };

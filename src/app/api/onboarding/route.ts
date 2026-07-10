@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       if (cvFile) {
         // In a real implementation, we would parse the PDF/DOCX using pdf-parse or mammoth
         // For now, we simulate extraction.
-        extractedText = `Uploaded CV: \${cvFile.name}. Extracted simulated text.`;
+        extractedText = `Uploaded CV: ${cvFile.name}. Extracted simulated text.`;
       }
 
       // Fetch user's connected social accounts

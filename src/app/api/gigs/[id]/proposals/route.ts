@@ -59,9 +59,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       data: {
         gigId: gig.id,
         freelancerId: session.user.id,
-        coverLetter: finalCoverLetter,
-        bidAmount: parseFloat(bidAmount || gig.budget),
-        estimatedDays: parseInt(estimatedDays) || 0,
+        coverLetter: finalCoverLetter || "No cover letter provided.",
+        bidAmount: bidAmount != null && bidAmount !== "" ? parseFloat(bidAmount) : gig.budget,
+        estimatedDays: estimatedDays != null && estimatedDays !== "" ? parseInt(estimatedDays) : null,
         generatedByAgent: useAiDraft === true,
         matchScore: matchScore > 0 ? matchScore : null,
       },

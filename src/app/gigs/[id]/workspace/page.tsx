@@ -21,11 +21,11 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
 
   const fetchData = async () => {
     try {
-      const gigRes = await fetch(`/api/gigs/\${unwrappedParams.id}`);
+      const gigRes = await fetch(`/api/gigs/${unwrappedParams.id}`);
       const gigData = await gigRes.json();
       setGig(gigData);
 
-      const tasksRes = await fetch(`/api/gigs/\${unwrappedParams.id}/tasks`);
+      const tasksRes = await fetch(`/api/gigs/${unwrappedParams.id}/tasks`);
       const tasksData = await tasksRes.json();
       setTasks(tasksData);
     } catch (err) {
@@ -38,7 +38,7 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
   const handleGenerateTasks = async () => {
     setGenerating(true);
     try {
-      const res = await fetch(`/api/gigs/\${unwrappedParams.id}/tasks/generate`, {
+      const res = await fetch(`/api/gigs/${unwrappedParams.id}/tasks/generate`, {
         method: 'POST'
       });
       if (!res.ok) throw new Error('Failed to generate tasks');
@@ -55,7 +55,7 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
     try {
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
       
-      const res = await fetch(`/api/gigs/\${unwrappedParams.id}/tasks/\${taskId}`, {
+      const res = await fetch(`/api/gigs/${unwrappedParams.id}/tasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -91,7 +91,7 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
             </p>
           </div>
           <div>
-            <button className="btn btn-secondary" onClick={() => router.push(`/gigs/\${gig.id}`)}>
+            <button className="btn btn-secondary" onClick={() => router.push(`/gigs/${gig.id}`)}>
               Back to Details
             </button>
           </div>

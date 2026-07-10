@@ -45,6 +45,10 @@ export async function POST(req: Request) {
 
     const data = await req.json();
 
+    if (data.budget == null || isNaN(parseFloat(data.budget))) {
+      return NextResponse.json({ error: 'Valid budget is required' }, { status: 400 });
+    }
+
     const newGig = await prisma.gig.create({
       data: {
         clientId: session.user.id,

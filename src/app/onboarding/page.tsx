@@ -54,7 +54,7 @@ export default function OnboardingPage() {
             <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
               <div
                 onClick={() => setRole('FREELANCER')}
-                className={`card card-interactive \${role === 'FREELANCER' ? 'bg-primary' : ''}`}
+                className={`card card-interactive ${role === 'FREELANCER' ? 'bg-primary' : ''}`}
                 style={{ flex: 1, textAlign: 'center', cursor: 'pointer', border: role === 'FREELANCER' ? '2px solid var(--color-accent-primary)' : '' }}
               >
                 <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>💻</div>
@@ -62,7 +62,7 @@ export default function OnboardingPage() {
               </div>
               <div
                 onClick={() => setRole('CLIENT')}
-                className={`card card-interactive \${role === 'CLIENT' ? 'bg-primary' : ''}`}
+                className={`card card-interactive ${role === 'CLIENT' ? 'bg-primary' : ''}`}
                 style={{ flex: 1, textAlign: 'center', cursor: 'pointer', border: role === 'CLIENT' ? '2px solid var(--color-accent-primary)' : '' }}
               >
                 <div style={{ fontSize: '2rem', marginBottom: 'var(--space-2)' }}>🏢</div>

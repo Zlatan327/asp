@@ -10,6 +10,7 @@ interface WalletContextType {
   connectWallet: () => Promise<void>;
   switchChain: () => Promise<void>;
   disconnect: () => void;
+  signMessage: (message: string) => Promise<string>;
   isCorrectChain: boolean;
 }
 
@@ -141,10 +142,18 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     setChainId(null);
   };
 
+  const signMessage = async (message: string) => {
+    const provider = getWindowProvider();
+    if (!provider || !address) throw new Error('Wallet not connected');
+    const ethersProvider = new ethers.BrowserProvider(provider);
+    const signer = await ethersProvider.getSigner();
+    return await signer.signMessage(message);
+  };
+
   const isCorrectChain = chainId === XLAYER_TESTNET_CHAIN_ID;
 
   return (
-    <WalletContext.Provider value={{ address, chainId, isConnecting, connectWallet, switchChain, disconnect, isCorrectChain }}>
+    <WalletContext.Provider value={{ address, chainId, isConnecting, connectWallet, switchChain, disconnect, signMessage, isCorrectChain }}>
       {children}
       {/* Network Warning Banner */}
       {address && !isCorrectChain && (

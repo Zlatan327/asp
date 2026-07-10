@@ -24,7 +24,7 @@ export default function EscrowPanel({ gig, isClient, onEscrowCreated }: { gig: a
       
       setStatusText('Syncing with platform...');
       // 4. Save to DB
-      await fetch(`/api/gigs/\${gig.id}/escrow`, {
+      await fetch(`/api/gigs/${gig.id}/escrow`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ escrowAddress })
@@ -49,7 +49,7 @@ export default function EscrowPanel({ gig, isClient, onEscrowCreated }: { gig: a
       await EscrowService.releaseMilestone(gig.escrowContractAddress, 0); // Index 0 for 1 milestone
       
       setStatusText('Finalizing gig and calculating reputation score...');
-      const res = await fetch(`/api/gigs/\${gig.id}/complete`, {
+      const res = await fetch(`/api/gigs/${gig.id}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientRating: 5, clientFeedback: "Great job!" }) // Default for now

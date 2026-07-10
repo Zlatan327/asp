@@ -44,9 +44,9 @@ export default function FeaturesSection() {
                 marginBottom: 'var(--space-4)', 
                 width: 60, height: 60, 
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: `color-mix(in srgb, \${feature.color} 15%, transparent)`,
+                background: `color-mix(in srgb, ${feature.color} 15%, transparent)`,
                 borderRadius: 'var(--radius-md)',
-                border: `1px solid color-mix(in srgb, \${feature.color} 30%, transparent)`
+                border: `1px solid color-mix(in srgb, ${feature.color} 30%, transparent)`
               }}>
                 {feature.icon}
               </div>

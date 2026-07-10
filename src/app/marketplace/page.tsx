@@ -94,7 +94,7 @@ export default function MarketplacePage() {
               </div>
             ) : (
               gigs.map((gig) => (
-                <Link key={gig.id} href={`/gigs/\${gig.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link key={gig.id} href={`/gigs/${gig.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className="card card-interactive" style={{ padding: 'var(--space-6)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)' }}>
                       <div>
