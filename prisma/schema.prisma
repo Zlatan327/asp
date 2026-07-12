@@ -35,6 +35,8 @@ model User {
   agentLogs         AgentLog[]
   sentReviews       Review[]          @relation("ReviewAuthor")
   receivedReviews   Review[]          @relation("ReviewSubject")
+  bountiesPosted    Bounty[]
+  bountyClaims      BountyClaim[]
 }
 
 // ─── Freelancer Profile ──────────────────────────────────
@@ -213,6 +215,8 @@ model Reputation {
   ratingScore       Float    @default(0)
   deliveryScore     Float    @default(0)
   disputeScore      Float    @default(0)
+  socialReliabilityScore Float @default(50) // For Micro-Bounties
+  tasksCompleted    Int      @default(0)    // For unlocking Auto-Bounty Bot
   badges            String   @default("[]") // JSON array of badge objects
   onChainTokenId    String?
   onChainSynced     Boolean  @default(false)
@@ -257,4 +261,45 @@ model AgentLog {
   createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id])
+}
+
+// ─── Micro-Bounties (Social) ─────────────────────────────
+
+model Bounty {
+  id             String   @id @default(cuid())
+  clientId       String
+  title          String
+  description    String
+  platform       String   // TWITTER, DISCORD, etc.
+  action         String   // LIKE, RETWEET, FOLLOW
+  targetUrl      String
+  targetAccount  String?
+  poolAmount     Float    // Total USDT locked in contract
+  rewardAmount   Float    // Reward per user
+  maxParticipants Int     @default(100)
+  participantsCount Int   @default(0)
+  status         String   @default("OPEN") // OPEN, COMPLETED, CANCELLED
+  contractAddress String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  client         User          @relation(fields: [clientId], references: [id])
+  claims         BountyClaim[]
+}
+
+model BountyClaim {
+  id           String   @id @default(cuid())
+  bountyId     String
+  userId       String
+  status       String   @default("PENDING") // PENDING, VERIFIED, REJECTED
+  proofData    String?  // JSON: ZK proof or mocked receipt
+  txHash       String?  // Tx hash of the payout
+  autoClaimed  Boolean  @default(false) // Was this claimed by the Auto-Bounty Bot?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bounty Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([bountyId, userId])
 }

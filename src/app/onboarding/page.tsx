@@ -91,9 +91,9 @@ export default function OnboardingPage() {
               <div>
                 <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>Social Connections</label>
                 <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                  <button type="button" className="btn btn-secondary" style={{ flex: 1 }}>GitHub</button>
-                  <button type="button" className="btn btn-secondary" style={{ flex: 1 }}>X</button>
-                  <button type="button" className="btn btn-secondary" style={{ flex: 1 }}>Discord</button>
+                  <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => alert('Redirecting to GitHub OAuth...')}>GitHub</button>
+                  <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => alert('Redirecting to X OAuth...')}>X</button>
+                  <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => alert('Redirecting to Discord OAuth...')}>Discord</button>
                 </div>
                 <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 'var(--space-2)' }}>
                   Connections are verified via OAuth.

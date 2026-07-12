@@ -23,6 +23,9 @@ export default function Header() {
         <Link href="/marketplace" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
           Marketplace
         </Link>
+        <Link href="/bounties" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+          Bounty Hub
+        </Link>
         <Link href="/dashboard" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
           Dashboard
         </Link>

@@ -6,6 +6,8 @@ import { EscrowService } from '@/lib/blockchain/contracts';
 export default function EscrowPanel({ gig, isClient, onEscrowCreated }: { gig: any; isClient: boolean; onEscrowCreated: () => void }) {
   const [loading, setLoading] = useState(false);
   const [statusText, setStatusText] = useState('');
+  const [rating, setRating] = useState(5);
+  const [feedback, setFeedback] = useState('');
 
   const handleFundEscrow = async () => {
     try {
@@ -52,7 +54,7 @@ export default function EscrowPanel({ gig, isClient, onEscrowCreated }: { gig: a
       const res = await fetch(`/api/gigs/${gig.id}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clientRating: 5, clientFeedback: "Great job!" }) // Default for now
+        body: JSON.stringify({ clientRating: rating, clientFeedback: feedback || "Great job!" })
       });
       const data = await res.json();
       
@@ -112,9 +114,19 @@ export default function EscrowPanel({ gig, isClient, onEscrowCreated }: { gig: a
       </div>
       
       {isClient && gig.status === 'IN_PROGRESS' && (
-        <button className="btn btn-primary w-full" onClick={handleRelease} disabled={loading}>
-          {loading ? statusText : 'Approve Work & Release Payment'}
-        </button>
+        <div style={{ marginTop: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', borderTop: '1px solid var(--color-border-subtle)', paddingTop: 'var(--space-4)' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>Rating (1-5)</label>
+            <input type="number" min="1" max="5" value={rating} onChange={(e) => setRating(Number(e.target.value))} className="input w-full" disabled={loading} />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontSize: 'var(--text-sm)', fontWeight: 600 }}>Feedback</label>
+            <textarea value={feedback} onChange={(e) => setFeedback(e.target.value)} placeholder="Leave a review for the freelancer..." className="input w-full" rows={3} disabled={loading} />
+          </div>
+          <button className="btn btn-primary w-full" onClick={handleRelease} disabled={loading}>
+            {loading ? statusText : 'Approve Work & Release Payment'}
+          </button>
+        </div>
       )}
       {!isClient && gig.status === 'IN_PROGRESS' && (
         <p style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-sm)' }}>

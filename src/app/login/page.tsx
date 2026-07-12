@@ -4,8 +4,11 @@ import { signIn } from 'next-auth/react';
 import { useWallet } from '@/components/WalletProvider';
 import { SiweMessage } from 'siwe';
 
+import { useState } from 'react';
+
 export default function LoginPage() {
   const { connectWallet, address, isConnecting, chainId, signMessage } = useWallet();
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-6)', position: 'relative' }}>
@@ -77,6 +80,7 @@ export default function LoginPage() {
                 await connectWallet();
               } else {
                 try {
+                  setIsSigningIn(true);
                   const nonceRes = await fetch('/api/auth/nonce');
                   const { nonce } = await nonceRes.json();
                   
@@ -101,15 +105,17 @@ export default function LoginPage() {
                 } catch (error) {
                   console.error('SIWE Error:', error);
                   alert('Failed to sign in with wallet.');
+                } finally {
+                  setIsSigningIn(false);
                 }
               }
             }}
-            disabled={isConnecting}
+            disabled={isConnecting || isSigningIn}
             className="btn btn-primary w-full"
             style={{ justifyContent: 'center' }}
           >
             <span style={{ marginRight: 'var(--space-2)' }}>👛</span>
-            {isConnecting ? 'Connecting...' : address ? 'Sign Message to Login' : 'Connect OKX Wallet'}
+            {isConnecting ? 'Connecting...' : isSigningIn ? 'Signing in...' : address ? 'Sign Message to Login' : 'Connect OKX Wallet'}
           </button>
 
           {address && (

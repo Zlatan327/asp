@@ -68,7 +68,15 @@ export default function NewGigPage() {
           <div>
             <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>
               Description
-              <span className="badge badge-info" style={{ marginLeft: 8, cursor: 'pointer' }}>✨ Use AI Assist</span>
+              <span 
+                className="badge badge-info" 
+                style={{ marginLeft: 8, cursor: 'pointer' }}
+                onClick={() => {
+                  setFormData({...formData, description: "We are looking for an experienced Web3 developer to build a smart contract for our new project. The ideal candidate will have 3+ years of Solidity experience and a strong understanding of ERC-20 standards. Deliverables include the contract, unit tests, and deployment scripts."});
+                }}
+              >
+                ✨ Use AI Assist
+              </span>
             </label>
             <textarea 
               required

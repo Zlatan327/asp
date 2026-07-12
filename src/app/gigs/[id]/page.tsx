@@ -11,6 +11,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
   const { data: session } = useSession();
   const [gig, setGig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isAccepting, setIsAccepting] = useState<string | null>(null);
   
   // Proposal State
   const [submitting, setSubmitting] = useState(false);
@@ -30,6 +31,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
       })
       .catch(err => {
         console.error(err);
+        alert('Failed to load gig details.');
         setLoading(false);
       });
   }, [unwrappedParams.id]);
@@ -65,6 +67,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
   const handleAccept = async (proposalId: string) => {
     if (!confirm('Are you sure you want to hire this freelancer?')) return;
     try {
+      setIsAccepting(proposalId);
       const res = await fetch(`/api/gigs/${gig.id}/accept`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,6 +79,8 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
     } catch (err: any) {
       console.error(err);
       alert(err.message);
+    } finally {
+      setIsAccepting(null);
     }
   };
 
@@ -132,8 +137,9 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
                           className="btn btn-primary" 
                           style={{ marginTop: 'var(--space-4)', padding: 'var(--space-2) var(--space-4)', fontSize: 'var(--text-xs)' }}
                           onClick={() => handleAccept(p.id)}
+                          disabled={isAccepting === p.id}
                         >
-                          Hire Freelancer
+                          {isAccepting === p.id ? 'Hiring...' : 'Hire Freelancer'}
                         </button>
                       )}
                       {p.status === 'ACCEPTED' && (

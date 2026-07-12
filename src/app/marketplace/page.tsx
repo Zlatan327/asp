@@ -19,6 +19,13 @@ interface Gig {
 export default function MarketplacePage() {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    budgetTypeFixed: false,
+    budgetTypeHourly: false,
+    expBeginner: false,
+    expIntermediate: false,
+    expExpert: false,
+  });
 
   useEffect(() => {
     fetch('/api/gigs')
@@ -29,9 +36,32 @@ export default function MarketplacePage() {
       })
       .catch((err) => {
         console.error(err);
+        alert('Failed to load marketplace gigs.');
         setLoading(false);
       });
   }, []);
+
+  const filteredGigs = gigs.filter((gig) => {
+    // Budget Type Filter
+    const filterFixed = filters.budgetTypeFixed;
+    const filterHourly = filters.budgetTypeHourly;
+    if (filterFixed || filterHourly) {
+      if (gig.budgetType === 'FIXED' && !filterFixed) return false;
+      if (gig.budgetType === 'HOURLY' && !filterHourly) return false;
+    }
+
+    // Experience Filter
+    const expB = filters.expBeginner;
+    const expI = filters.expIntermediate;
+    const expE = filters.expExpert;
+    if (expB || expI || expE) {
+      if (gig.experienceLevel === 'BEGINNER' && !expB) return false;
+      if (gig.experienceLevel === 'INTERMEDIATE' && !expI) return false;
+      if (gig.experienceLevel === 'EXPERT' && !expE) return false;
+    }
+
+    return true;
+  });
 
   return (
     <div style={{ minHeight: '100vh', padding: 'var(--space-8)' }}>
@@ -57,10 +87,10 @@ export default function MarketplacePage() {
                 <label style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Budget Type</label>
                 <div style={{ marginTop: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" /> Fixed Price
+                    <input type="checkbox" checked={filters.budgetTypeFixed} onChange={e => setFilters({...filters, budgetTypeFixed: e.target.checked})} /> Fixed Price
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" /> Hourly Rate
+                    <input type="checkbox" checked={filters.budgetTypeHourly} onChange={e => setFilters({...filters, budgetTypeHourly: e.target.checked})} /> Hourly Rate
                   </label>
                 </div>
               </div>
@@ -69,13 +99,13 @@ export default function MarketplacePage() {
                 <label style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Experience</label>
                 <div style={{ marginTop: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" /> Beginner
+                    <input type="checkbox" checked={filters.expBeginner} onChange={e => setFilters({...filters, expBeginner: e.target.checked})} /> Beginner
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" /> Intermediate
+                    <input type="checkbox" checked={filters.expIntermediate} onChange={e => setFilters({...filters, expIntermediate: e.target.checked})} /> Intermediate
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" /> Expert
+                    <input type="checkbox" checked={filters.expExpert} onChange={e => setFilters({...filters, expExpert: e.target.checked})} /> Expert
                   </label>
                 </div>
               </div>
@@ -88,12 +118,12 @@ export default function MarketplacePage() {
               <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-tertiary)' }}>
                 Loading gigs...
               </div>
-            ) : gigs.length === 0 ? (
+            ) : filteredGigs.length === 0 ? (
               <div className="card" style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-tertiary)' }}>
-                No active gigs found. Be the first to post one!
+                No active gigs found matching your filters.
               </div>
             ) : (
-              gigs.map((gig) => (
+              filteredGigs.map((gig) => (
                 <Link key={gig.id} href={`/gigs/${gig.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className="card card-interactive" style={{ padding: 'var(--space-6)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)' }}>

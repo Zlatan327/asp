@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
+import Link from 'next/link';
 
 const safeParse = (str: string | null | undefined, fallback: any = []) => {
   try { return str ? JSON.parse(str) : fallback; } catch (e) { return fallback; }
@@ -64,13 +65,13 @@ export default async function DashboardPage() {
         </div>
         
         <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
-          <a href="/marketplace" className="btn btn-secondary">
+          <Link href="/marketplace" className="btn btn-secondary">
             Browse Gigs
-          </a>
+          </Link>
           {isClient && (
-            <a href="/gigs/new" className="btn btn-primary">
+            <Link href="/gigs/new" className="btn btn-primary">
               Post a Gig
-            </a>
+            </Link>
           )}
         </div>
       </header>
@@ -148,12 +149,23 @@ export default async function DashboardPage() {
           {user.gigsWorked.length === 0 && user.gigsPosted.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 'var(--space-8) 0', color: 'var(--color-text-tertiary)' }}>
               <p>No active gigs found.</p>
-              <a href="/marketplace" style={{ color: 'var(--color-accent-primary)', marginTop: 'var(--space-2)', display: 'inline-block' }}>Explore Marketplace →</a>
+              <Link href="/marketplace" style={{ color: 'var(--color-accent-primary)', marginTop: 'var(--space-2)', display: 'inline-block' }}>Explore Marketplace →</Link>
             </div>
           ) : (
-            <div>
-              {/* List gigs here */}
-              <p style={{ color: 'var(--color-text-secondary)' }}>You have active gigs. View them below.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              {[...user.gigsWorked, ...user.gigsPosted]
+                .filter(g => g.status === 'IN_PROGRESS' || g.status === 'OPEN')
+                .map(gig => (
+                  <Link href={`/gigs/${gig.id}`} key={gig.id} style={{ display: 'block', padding: 'var(--space-4)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)', background: 'var(--color-background-elevated)', textDecoration: 'none', color: 'inherit' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600 }}>{gig.title}</h3>
+                      <span className={`badge ${gig.status === 'OPEN' ? 'badge-info' : 'badge-warning'}`}>{gig.status}</span>
+                    </div>
+                    <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
+                      Budget: {gig.budget} USDT
+                    </div>
+                  </Link>
+              ))}
             </div>
           )}
         </div>

@@ -30,6 +30,7 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
       setTasks(tasksData);
     } catch (err) {
       console.error(err);
+      alert('Failed to load workspace data.');
     } finally {
       setLoading(false);
     }
