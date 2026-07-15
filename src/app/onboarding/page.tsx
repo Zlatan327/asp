@@ -30,7 +30,7 @@ export default function OnboardingPage() {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         if (res.status === 401) {
-          throw new Error('Unauthorized');
+          throw new Error('Unauthorized: ' + (errorData.details || ''));
         }
         throw new Error(errorData.error || errorData.details || 'Onboarding failed');
       }
