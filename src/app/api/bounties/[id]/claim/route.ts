@@ -43,27 +43,24 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Verification Failed" }, { status: 400 });
     }
 
-    // 3. Trigger Smart Contract Payout from backend
-    let txHash = "mock_tx_hash";
+    // 3. Generate a backend signature for the user to claim on-chain themselves
+    let txHash = null;
+    let signature = "";
     try {
-      const rpcUrl = process.env.XLAYER_TESTNET_RPC || "https://testrpc.xlayer.tech/terigon";
       const privateKey = process.env.PRIVATE_KEY;
       if (privateKey) {
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
-        const backendWallet = new ethers.Wallet(privateKey, provider);
-        const bountyContract = new ethers.Contract(BOUNTY_POOL_ADDRESS, BountyPoolArtifact.abi, backendWallet);
-
-        // Get user wallet
-        const user = await prisma.user.findUnique({ where: { id: userId } });
-        if (user && user.walletAddress) {
-          const tx = await bountyContract.distributeReward(bountyId, user.walletAddress);
-          const receipt = await tx.wait();
-          txHash = receipt.hash;
-        }
+        const backendWallet = new ethers.Wallet(privateKey);
+        
+        // EIP-191 standard signed message: keccak256(bountyId, userId)
+        const messageHash = ethers.solidityPackedKeccak256(
+          ["string", "string"], 
+          [bountyId, userId]
+        );
+        signature = await backendWallet.signMessage(ethers.getBytes(messageHash));
       }
     } catch (e) {
-      console.error("Smart contract execution failed:", e);
-      // For hackathon MVP, if gas fails we still record the DB claim
+      console.error("Signature generation failed:", e);
+      return NextResponse.json({ error: "Failed to generate claim signature" }, { status: 500 });
     }
 
     // 4. Record the claim and update reputation
@@ -103,7 +100,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       });
     }
 
-    return NextResponse.json({ success: true, claim });
+    return NextResponse.json({ success: true, claim, signature });
   } catch (error) {
     console.error("POST /api/bounties/[id]/claim Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

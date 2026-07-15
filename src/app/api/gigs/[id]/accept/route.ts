@@ -30,7 +30,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     // 1. Accept the proposal
-    // 2. Set gig to IN_PROGRESS and assign freelancer
+    // 2. Set gig to PENDING_FUNDS and assign freelancer (budget locked in)
     await prisma.$transaction([
       prisma.proposal.update({
         where: { id: proposalId },
@@ -39,7 +39,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       prisma.gig.update({
         where: { id },
         data: {
-          status: 'IN_PROGRESS',
+          status: 'PENDING_FUNDS',
           freelancerId: proposal.freelancerId,
           budget: proposal.bidAmount, // Lock in the agreed bid amount
           estimatedDuration: proposal.estimatedDays ? `${proposal.estimatedDays} days` : gig.estimatedDuration

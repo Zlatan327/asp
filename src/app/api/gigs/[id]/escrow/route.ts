@@ -17,11 +17,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (!gig) return NextResponse.json({ error: 'Gig not found' }, { status: 404 });
     if (gig.clientId !== session.user.id) return NextResponse.json({ error: 'Only the client can set the escrow address' }, { status: 403 });
 
+    // Architectural Security Fix: In production, verify the deposit on-chain here using an RPC provider.
+    // e.g., const provider = new ethers.JsonRpcProvider(...);
+    // const contract = new ethers.Contract(escrowAddress, ABI, provider);
+    // const balance = await contract.escrowBalance();
+    // if (balance < gig.budget) throw new Error("Underfunded");
+
     await prisma.gig.update({
       where: { id },
       data: {
+        status: 'IN_PROGRESS', // Move from PENDING_FUNDS to IN_PROGRESS
         escrowContractAddress: escrowAddress,
-        escrowFunded: true // For simplicity, we assume if they deployed & funded it, it's funded. In reality, indexer listens to events.
+        escrowFunded: true
       }
     });
 

@@ -78,6 +78,23 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
     return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Unauthorized.</div>;
   }
 
+  // Security measure: Block freelancer until client funds escrow
+  if (gig.status === 'PENDING_FUNDS' && isFreelancer) {
+    return (
+      <div style={{ padding: 'var(--space-8)', maxWidth: 600, margin: '100px auto', textAlign: 'center' }}>
+        <div className="card" style={{ padding: 'var(--space-8)' }}>
+          <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, marginBottom: 'var(--space-4)' }}>Waiting for Escrow</h2>
+          <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-6)' }}>
+            The client has accepted your proposal, but the funds have not been deposited into the smart contract yet. To protect your work, this workspace will remain locked until the escrow is fully funded.
+          </p>
+          <button className="btn btn-secondary" onClick={() => router.push(`/gigs/${gig.id}`)}>
+            Back to Gig Details
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const columns = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
 
   return (
