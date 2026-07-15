@@ -28,11 +28,11 @@ export default function LoginPage() {
               KLOP<span style={{ color: 'var(--color-accent-primary)' }}>.</span>
             </div>
           </div>
-          <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
-            Welcome to FreelanceAI
+          <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
+            Welcome to KLOP
           </h1>
           <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
-            Connect to start earning or hiring on OKX.AI
+            Your OKX.AI freelance agentic marketplace.
           </p>
         </div>
 
