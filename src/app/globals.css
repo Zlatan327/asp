@@ -8,11 +8,11 @@
 
 /* ---------- CSS Custom Properties (Design Tokens) ---------- */
 :root {
-  /* — Brand Colors (Sleek, Professional Dark Mode) — */
-  --color-bg-primary: #000000;
-  --color-bg-secondary: #0a0a0a;
-  --color-bg-tertiary: #111111;
-  --color-bg-elevated: #1a1a1a;
+  /* — Brand Colors (Reddish Black Theme) — */
+  --color-bg-primary: #0a0303;     /* Deep reddish black */
+  --color-bg-secondary: #120505;   /* Slightly lighter reddish black */
+  --color-bg-tertiary: #1a0808;    /* Elevated reddish black */
+  --color-bg-elevated: #240b0b;
   --color-bg-card: rgba(255, 255, 255, 0.03);
   --color-bg-card-hover: rgba(255, 255, 255, 0.05);
   --color-bg-input: rgba(255, 255, 255, 0.02);

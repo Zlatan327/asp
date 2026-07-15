@@ -16,11 +16,8 @@ export default function LandingPage() {
         <div className="container relative z-10">
           <h2 style={{ fontSize: 'var(--text-4xl)', fontWeight: 900, marginBottom: 'var(--space-6)' }}>Ready to experience Web3 Freelancing?</h2>
           <div style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center' }}>
-            <Link href="/onboarding?role=FREELANCER" className="btn btn-primary btn-lg">
-              Start Earning
-            </Link>
-            <Link href="/marketplace" className="btn btn-secondary btn-lg">
-              Explore Gigs
+            <Link href="/login" className="btn btn-primary btn-lg">
+              Enter Application
             </Link>
           </div>
         </div>

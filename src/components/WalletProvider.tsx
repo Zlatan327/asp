@@ -97,6 +97,18 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      try {
+        // Force the wallet to show the account selection popup
+        await provider.request({
+          method: 'wallet_requestPermissions',
+          params: [{ eth_accounts: {} }]
+        });
+      } catch (err: any) {
+        // If user rejects the permission request, stop connecting
+        if (err.code === 4001) return;
+        // Some older wallets might not support this RPC method, ignore and proceed
+      }
+
       const accounts = await provider.request({ method: 'eth_requestAccounts' });
       setAddress(accounts[0]);
 

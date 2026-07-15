@@ -18,22 +18,15 @@ export default function LoginPage() {
 
       <div className="glass-card" style={{ maxWidth: 440, width: '100%', padding: 'var(--space-8)' }}>
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
-          <div
-            style={{
-              width: 48,
-              height: 48,
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--color-accent-gradient)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: 'var(--text-lg)',
-              color: 'var(--color-text-inverse)',
-              margin: '0 auto var(--space-4)',
-            }}
-          >
-            ASP
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--space-6)' }}>
+            <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center' }}>
+              <svg width="40" height="40" viewBox="0 0 100 100" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '12px' }}>
+                <path d="M 25 25 L 40 25 C 40 10, 60 10, 60 25 L 75 25 L 75 40 C 90 40, 90 60, 75 60 L 75 75 L 60 75 C 60 60, 40 60, 40 75 L 25 75 L 25 60 C 10 60, 10 40, 25 40 Z" />
+                <path d="M 35 50 Q 50 35 65 50 Q 50 65 35 50 Z" fill="var(--color-bg-elevated)" />
+                <circle cx="50" cy="50" r="5" fill="currentColor" />
+              </svg>
+              KLOP<span style={{ color: 'var(--color-accent-primary)' }}>.</span>
+            </div>
           </div>
           <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
             Welcome to FreelanceAI
@@ -81,31 +74,47 @@ export default function LoginPage() {
                 await connectWallet();
               } else {
                 try {
+                  console.group('SIWE Auth Flow');
                   setIsSigningIn(true);
+                  console.log('Fetching nonce...');
                   const nonceRes = await fetch('/api/auth/nonce');
                   const { nonce } = await nonceRes.json();
+                  console.log('Received nonce:', nonce);
                   
                   const message = new SiweMessage({
                     domain: window.location.host,
                     address: ethers.getAddress(address),
-                    statement: 'Sign in to ASP platform with your OKX Wallet.',
+                    statement: 'Sign in to KLOP platform with your OKX Wallet.',
                     uri: window.location.origin,
                     version: '1',
                     chainId: chainId || 196,
                     nonce,
                   });
                   
+                  console.log('Generated SIWE Message:', message);
                   const preparedMessage = message.prepareMessage();
+                  console.log('Requesting signature...');
                   const signature = await signMessage(preparedMessage);
+                  console.log('Signature received:', signature);
                   
-                  await signIn('siwe', {
+                  console.log('Calling NextAuth signIn...');
+                  const res = await signIn('siwe', {
                     message: JSON.stringify(message),
                     signature,
-                    callbackUrl: '/onboarding',
+                    redirect: false,
                   });
+                  console.log('NextAuth response:', res);
+                  
+                  if (res?.ok) {
+                    console.log('Auth successful, redirecting...');
+                    window.location.href = '/onboarding';
+                  } else {
+                    console.error('SignIn Error:', res?.error);
+                  }
+                  console.groupEnd();
                 } catch (error) {
+                  console.groupEnd();
                   console.error('SIWE Error:', error);
-                  alert('Failed to sign in with wallet.');
                 } finally {
                   setIsSigningIn(false);
                 }

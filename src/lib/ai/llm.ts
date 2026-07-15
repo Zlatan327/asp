@@ -53,6 +53,28 @@ export async function chatCompletion(
   messages: LLMMessage[],
   options: LLMOptions = {}
 ): Promise<LLMResponse> {
+  // --- HACKATHON DEMO MOCK ---
+  const isMocked = true;
+  if (isMocked) {
+    await new Promise(r => setTimeout(r, 1500));
+    
+    const systemPrompt = messages.find(m => m.role === 'system')?.content || '';
+    
+    if (systemPrompt.includes('ASP Proposal Agent')) {
+      const mockJson = {
+        coverLetter: "Hi there! I am a highly skilled Web3 developer with extensive experience in Next.js and the X Layer ecosystem. I have reviewed the requirements for this gig and I am extremely confident I can deliver high-quality results ahead of your deadline. My Auto-Bot agent has verified that my GitHub repository history perfectly aligns with your required skills.\n\nI am ready to begin immediately and will utilize the X Layer USDT Escrow to guarantee trust. Looking forward to working with you!",
+        suggestedBid: 150,
+        confidence: 98,
+        keyPoints: ["Next.js Expert", "X Layer Experience", "Solidity Smart Contracts"],
+        referencedWork: ["github.com/my-repo/web3-dapp"]
+      };
+      return { content: JSON.stringify(mockJson), model: 'mock-mimo' };
+    }
+    
+    return { content: JSON.stringify({ success: true, message: "Mocked AI Response" }), model: 'mock-mimo' };
+  }
+  // -----------------------------
+
   const config = getConfig();
   const model = options.model || config.model;
 
