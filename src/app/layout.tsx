@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -46,6 +47,20 @@ export default function RootLayout({
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
+        />
+        <Script
+          id="okx-error-suppressor"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.addEventListener('unhandledrejection', function(event) {
+                if (event.reason && event.reason.code === 4900) {
+                  event.preventDefault();
+                  event.stopImmediatePropagation();
+                }
+              });
+            `
+          }}
         />
       </head>
       <body>
