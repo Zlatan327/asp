@@ -78,18 +78,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (!user.email) return true; // allow sign in, handle mapping later
-
       // Ensure user exists in DB
-      let dbUser = await prisma.user.findUnique({
-        where: { email: user.email },
-      });
+      let dbUser = null;
+      
+      if (user.email) {
+        dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        });
+      } else if (account) {
+        // Find by social account if no email
+        const social = await prisma.socialAccount.findFirst({
+          where: {
+            platform: account.provider.toUpperCase(),
+            handle: String(profile?.preferred_username || profile?.login || user.name || ""),
+          }
+        });
+        if (social) {
+          dbUser = await prisma.user.findUnique({ where: { id: social.userId } });
+        }
+      }
 
       if (!dbUser) {
         dbUser = await prisma.user.create({
           data: {
-            email: user.email,
-            name: user.name,
+            email: user.email || null,
+            name: user.name || 'Anonymous User',
             avatarUrl: user.image,
             role: "BOTH",
             tier: "FREE",
@@ -127,9 +140,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
+      // If user object is present (first sign in), we need to ensure token.sub is our DB user ID
       if (user) {
-        token.sub = user.id;
+        if (account?.provider !== 'siwe') {
+          // For OAuth providers, the user.id is the provider's ID.
+          // We need to fetch the actual DB user ID.
+          let dbUser = null;
+          if (user.email) {
+            dbUser = await prisma.user.findUnique({
+              where: { email: user.email }
+            });
+          } else if (account) {
+            const social = await prisma.socialAccount.findFirst({
+              where: {
+                platform: account.provider.toUpperCase(),
+                handle: String(profile?.preferred_username || profile?.login || user.name || ""),
+              }
+            });
+            if (social) {
+              dbUser = await prisma.user.findUnique({ where: { id: social.userId } });
+            }
+          }
+          
+          if (dbUser) {
+            token.sub = dbUser.id;
+          } else {
+            token.sub = user.id; // fallback
+          }
+        } else {
+          // For SIWE, we explicitly returned the DB user ID in authorize()
+          token.sub = user.id;
+        }
       }
       return token;
     },
