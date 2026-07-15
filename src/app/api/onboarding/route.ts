@@ -3,14 +3,15 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 import { scoutAgent } from '@/lib/ai';
 
-export async function POST(req: Request) {
+export const POST = auth(async (req: any) => {
   try {
-    // Pass req to auth() to ensure headers/cookies are properly extracted in POST route handlers
-    const session = (await auth(req)) as any;
+    const session = req.auth;
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized', details: JSON.stringify(session) }, { status: 401 });
     }
 
+    // req from auth() wrapper might need to use req.request or standard methods depending on NextAuth version
+    // But req is still a standard Request object in the NextAuth wrapper.
     const formData = await req.formData();
     const role = formData.get('role') as 'FREELANCER' | 'CLIENT';
     const cvFile = formData.get('cv') as File | null;
@@ -126,4 +127,4 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-}
+});
