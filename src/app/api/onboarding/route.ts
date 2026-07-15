@@ -5,7 +5,8 @@ import { scoutAgent } from '@/lib/ai';
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
+    // Pass req to auth() to ensure headers/cookies are properly extracted in POST route handlers
+    const session = (await auth(req)) as any;
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized', details: JSON.stringify(session) }, { status: 401 });
     }
