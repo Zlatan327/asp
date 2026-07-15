@@ -10,6 +10,7 @@ export default function OnboardingPage() {
   const [role, setRole] = useState<'FREELANCER' | 'CLIENT' | null>(null);
   const [loading, setLoading] = useState(false);
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [companyName, setCompanyName] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +20,7 @@ export default function OnboardingPage() {
       const formData = new FormData();
       formData.append('role', role || 'FREELANCER');
       if (cvFile) formData.append('cv', cvFile);
+      if (companyName) formData.append('companyName', companyName);
 
       const res = await fetch('/api/onboarding', {
         method: 'POST',
@@ -111,6 +113,8 @@ export default function OnboardingPage() {
                   placeholder="e.g. Acme Corp"
                   className="input"
                   style={{ width: '100%' }}
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
                 />
               </div>
             </div>

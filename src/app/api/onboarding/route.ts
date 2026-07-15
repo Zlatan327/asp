@@ -13,6 +13,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const role = formData.get('role') as 'FREELANCER' | 'CLIENT';
     const cvFile = formData.get('cv') as File | null;
+    const companyName = formData.get('companyName') as string | null;
 
     // Update user role and onboarded status
     await prisma.user.update({
@@ -91,9 +92,12 @@ export async function POST(req: Request) {
       // Create Client Profile
       await prisma.clientProfile.upsert({
         where: { userId: session.user.id },
-        update: {},
+        update: {
+          companyName: companyName || null,
+        },
         create: {
           userId: session.user.id,
+          companyName: companyName || null,
         }
       });
     }
@@ -102,7 +106,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Onboarding API Error:', error);
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Internal Server Error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
