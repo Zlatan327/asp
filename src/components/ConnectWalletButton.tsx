@@ -12,17 +12,25 @@ export default function ConnectWalletButton() {
 
   if (address) {
     return (
-      <button 
-        onClick={() => {
-          disconnect();
-          signOut({ callbackUrl: '/' });
-        }}
-        className="btn btn-secondary" 
-        style={{ fontSize: 'var(--text-xs)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-full)' }}
-      >
-        <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-success)', display: 'inline-block', marginRight: 'var(--space-2)' }}></span>
-        {truncateAddress(address)}
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+        <div 
+          style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-xs)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-full)', background: 'var(--color-bg-tertiary)', border: '1px solid var(--color-border)' }}
+        >
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-success)', display: 'inline-block' }}></span>
+          <span style={{ fontFamily: 'monospace' }}>{truncateAddress(address)}</span>
+        </div>
+        <button 
+          onClick={() => {
+            disconnect();
+            signOut({ callbackUrl: '/' });
+          }}
+          className="btn btn-secondary" 
+          style={{ fontSize: 'var(--text-xs)', padding: 'var(--space-2) var(--space-3)', borderRadius: 'var(--radius-full)' }}
+          title="Disconnect Wallet"
+        >
+          Disconnect
+        </button>
+      </div>
     );
   }
 
