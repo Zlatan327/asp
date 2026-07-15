@@ -34,22 +34,49 @@ export default function HeroSection() {
         </div>
 
         {/* Floating UI Elements Demo */}
-        <div className="animate-fade-in delay-5" style={{ marginTop: 'var(--space-16)', display: 'flex', justifyContent: 'center', gap: 'var(--space-6)' }}>
-          <div className="glass-card animate-bounce" style={{ padding: 'var(--space-4)', width: 250, textAlign: 'left' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-              <div className="avatar avatar-sm" style={{ background: 'var(--color-success)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>✓</div>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>Smart Escrow</span>
+        <div className="animate-fade-in delay-5" style={{ marginTop: 'var(--space-16)', display: 'flex', justifyContent: 'center', gap: 'var(--space-8)', flexWrap: 'wrap' }}>
+          
+          {/* Stunning Smart Escrow Card */}
+          <div className="glass-card animate-bounce" style={{ padding: 'var(--space-5)', width: 280, textAlign: 'left', border: '1px solid var(--color-accent-primary)', boxShadow: '0 0 20px rgba(255, 42, 42, 0.15)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '2px', background: 'var(--color-accent-gradient)' }}></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
+              <div style={{ background: 'rgba(255, 42, 42, 0.1)', padding: '8px', borderRadius: 'var(--radius-md)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <div>
+                <span style={{ fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-text-primary)', display: 'block' }}>Trustless Escrow</span>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-success)', fontWeight: 600 }}>Secured on X Layer</span>
+              </div>
             </div>
-            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>1000 USDT locked securely on X Layer.</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
+              <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-text-primary)' }}>1,000</span>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>USDT Locked</span>
+            </div>
           </div>
 
-          <div className="glass-card animate-bounce" style={{ padding: 'var(--space-4)', width: 250, textAlign: 'left', animationDelay: '0.5s' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
-              <div className="avatar avatar-sm" style={{ background: 'var(--color-accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>★</div>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600 }}>Reputation SBT</span>
+          {/* Stunning Reputation Card */}
+          <div className="glass-card animate-bounce" style={{ padding: 'var(--space-5)', width: 280, textAlign: 'left', animationDelay: '0.5s', border: '1px solid var(--color-accent-secondary)', boxShadow: '0 0 20px rgba(255, 107, 107, 0.15)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '2px', background: 'var(--color-accent-gradient)' }}></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-3)' }}>
+              <div style={{ background: 'rgba(255, 107, 107, 0.1)', padding: '8px', borderRadius: 'var(--radius-md)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </div>
+              <div>
+                <span style={{ fontSize: 'var(--text-sm)', fontWeight: 800, color: 'var(--color-text-primary)', display: 'block' }}>Immutable SBT</span>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-accent-secondary)', fontWeight: 600 }}>On-Chain Identity</span>
+              </div>
             </div>
-            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>Score updated to 98/100.</p>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
+              <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-text-primary)' }}>98<span style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text-tertiary)' }}>/100</span></span>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Global Rank</span>
+            </div>
           </div>
+
         </div>
       </div>
     </section>

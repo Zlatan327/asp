@@ -8,23 +8,23 @@
 
 /* ---------- CSS Custom Properties (Design Tokens) ---------- */
 :root {
-  /* — Brand Colors (Reddish Black Theme) — */
-  --color-bg-primary: #0a0303;     /* Deep reddish black */
-  --color-bg-secondary: #120505;   /* Slightly lighter reddish black */
-  --color-bg-tertiary: #1a0808;    /* Elevated reddish black */
-  --color-bg-elevated: #240b0b;
+  /* — Brand Colors (Vibrant Crimson Black Theme) — */
+  --color-bg-primary: #080000;     /* Deepest crimson black */
+  --color-bg-secondary: #140000;   /* Rich dark red */
+  --color-bg-tertiary: #1f0000;    /* Elevated crimson */
+  --color-bg-elevated: #2e0000;    /* High contrast dark red */
   --color-bg-card: rgba(255, 255, 255, 0.03);
-  --color-bg-card-hover: rgba(255, 255, 255, 0.05);
+  --color-bg-card-hover: rgba(255, 255, 255, 0.06);
   --color-bg-input: rgba(255, 255, 255, 0.02);
 
   /* — Accent Colors — */
-  --color-accent-primary: #ffffff;       /* Pure White for highest contrast */
-  --color-accent-primary-hover: #e0e0e0;
-  --color-accent-secondary: #888888;
-  --color-accent-secondary-hover: #aaaaaa;
-  --color-accent-gradient: #ffffff;
-  --color-accent-gradient-hover: #e0e0e0;
-  --color-accent-glow: transparent;
+  --color-accent-primary: #ff2a2a;       /* Vibrant Neon Red */
+  --color-accent-primary-hover: #ff4d4d;
+  --color-accent-secondary: #ff6b6b;
+  --color-accent-secondary-hover: #ff8e8e;
+  --color-accent-gradient: linear-gradient(135deg, #ff2a2a 0%, #ff6b6b 100%);
+  --color-accent-gradient-hover: linear-gradient(135deg, #ff4d4d 0%, #ff8e8e 100%);
+  --color-accent-glow: rgba(255, 42, 42, 0.6);
 
   /* — Status Colors — */
   --color-success: #2eaaa3;
@@ -40,7 +40,7 @@
   --color-text-primary: #ededed;
   --color-text-secondary: #a1a1aa;
   --color-text-tertiary: #71717a;
-  --color-text-inverse: #000000;
+  --color-text-inverse: #ffffff;
   --color-text-link: #ededed;
   --color-text-link-hover: #ffffff;
 
@@ -455,11 +455,11 @@ input::placeholder, textarea::placeholder {
 }
 
 .bg-orb-violet {
-  background: radial-gradient(circle, rgba(167, 139, 250, 0.4), transparent 70%);
+  background: radial-gradient(circle, rgba(255, 42, 42, 0.35), transparent 70%);
 }
 
 .bg-orb-blue {
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.3), transparent 70%);
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.3), transparent 70%);
 }
 
 .bg-orb-green {
