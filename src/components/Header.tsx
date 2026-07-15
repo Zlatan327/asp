@@ -11,9 +11,6 @@ export default async function Header() {
       alignItems: 'center', 
       justifyContent: 'space-between', 
       padding: 'var(--space-4) var(--space-6)',
-      borderBottom: '1px solid var(--color-border-subtle)',
-      background: 'rgba(10, 10, 15, 0.8)',
-      backdropFilter: 'blur(12px)',
       position: 'sticky',
       top: 0,
       zIndex: 'var(--z-sticky)'
