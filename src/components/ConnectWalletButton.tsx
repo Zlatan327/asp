@@ -1,6 +1,7 @@
 'use client';
 
 import { useWallet } from './WalletProvider';
+import { signOut } from 'next-auth/react';
 
 export default function ConnectWalletButton() {
   const { address, isConnecting, connectWallet, disconnect } = useWallet();
@@ -12,7 +13,10 @@ export default function ConnectWalletButton() {
   if (address) {
     return (
       <button 
-        onClick={disconnect}
+        onClick={() => {
+          disconnect();
+          signOut({ callbackUrl: '/' });
+        }}
         className="btn btn-secondary" 
         style={{ fontSize: 'var(--text-xs)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-full)' }}
       >

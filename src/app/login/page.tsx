@@ -5,6 +5,7 @@ import { useWallet } from '@/components/WalletProvider';
 import { SiweMessage } from 'siwe';
 
 import { useState } from 'react';
+import { ethers } from 'ethers';
 
 export default function LoginPage() {
   const { connectWallet, address, isConnecting, chainId, signMessage } = useWallet();
@@ -86,7 +87,7 @@ export default function LoginPage() {
                   
                   const message = new SiweMessage({
                     domain: window.location.host,
-                    address,
+                    address: ethers.getAddress(address),
                     statement: 'Sign in to ASP platform with your OKX Wallet.',
                     uri: window.location.origin,
                     version: '1',
