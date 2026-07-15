@@ -310,14 +310,15 @@ input::placeholder, textarea::placeholder {
 }
 
 .btn-primary {
-  background: var(--color-text-primary);
+  background: var(--color-accent-primary);
   color: var(--color-text-inverse);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 14px 0 var(--color-accent-glow);
 }
 
 .btn-primary:hover {
-  background: #ffffff;
-  transform: translateY(-1px);
+  background: var(--color-accent-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 42, 42, 0.8);
 }
 
 .btn-primary::before {
