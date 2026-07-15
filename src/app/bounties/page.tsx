@@ -11,7 +11,7 @@ export default async function BountiesPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { reputationScore: true },
+    include: { reputationScore: true, socialAccounts: true },
   });
 
   const bounties = await prisma.bounty.findMany({
@@ -27,6 +27,10 @@ export default async function BountiesPage() {
   const srs = user?.reputationScore?.socialReliabilityScore || 50;
   const botUnlocked = tasksCompleted >= 10 && srs >= 90;
 
+  // Check social connections
+  const hasTwitter = user?.socialAccounts?.some((s) => s.platform === "TWITTER") || false;
+  const hasDiscord = user?.socialAccounts?.some((s) => s.platform === "DISCORD") || false;
+
   return (
     <BountyClient 
       initialBounties={bounties} 
@@ -34,6 +38,8 @@ export default async function BountiesPage() {
       botUnlocked={botUnlocked} 
       srs={srs} 
       tasksCompleted={tasksCompleted}
+      hasTwitter={hasTwitter}
+      hasDiscord={hasDiscord}
     />
   );
 }

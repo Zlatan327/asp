@@ -4,14 +4,24 @@ import { useState } from "react";
 import { Bot, CheckCircle, Zap, Shield, Loader2, Coins } from "lucide-react";
 import ZkVerificationModal from "@/components/ZkVerificationModal";
 
-export default function BountyClient({ initialBounties, userId, botUnlocked, srs, tasksCompleted }: any) {
+export default function BountyClient({ initialBounties, userId, botUnlocked, srs, tasksCompleted, hasTwitter, hasDiscord }: any) {
   const [bounties, setBounties] = useState(initialBounties);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [targetUrl, setTargetUrl] = useState("");
   const [autoBotActive, setAutoBotActive] = useState(false);
   const [claiming, setClaiming] = useState<string | null>(null);
+  const [rentedBot, setRentedBot] = useState(false);
+  const [renting, setRenting] = useState(false);
 
   const handleVerifyClick = (bounty: any) => {
+    if (bounty.platform === 'TWITTER' && !hasTwitter) {
+      alert("You must connect your X (Twitter) account in your profile before verifying this bounty.");
+      return;
+    }
+    if (bounty.platform === 'DISCORD' && !hasDiscord) {
+      alert("You must connect your Discord account in your profile before verifying this bounty.");
+      return;
+    }
     setTargetUrl(bounty.targetUrl);
     setVerifyingId(bounty.id);
   };
@@ -46,8 +56,16 @@ export default function BountyClient({ initialBounties, userId, botUnlocked, srs
   };
 
   const handleBotToggle = () => {
-    if (!botUnlocked) {
-      alert("You need 10+ completed tasks and 90+ SRS to unlock the Auto-Bot!");
+    if (!botUnlocked && !rentedBot) {
+      if (confirm("You need 10+ completed tasks and 90+ SRS to organically unlock the Auto-Bot.\\n\\nWould you like to RENT the Auto-Bot for 50 USDT instead?")) {
+        setRenting(true);
+        setTimeout(() => {
+          setRenting(false);
+          setRentedBot(true);
+          setAutoBotActive(true);
+          alert("Payment successful! Auto-Bot rented and activated.");
+        }, 2000);
+      }
       return;
     }
     setAutoBotActive(!autoBotActive);
@@ -79,14 +97,15 @@ export default function BountyClient({ initialBounties, userId, botUnlocked, srs
             <div className="w-px h-8 bg-white/10"></div>
             <button 
               onClick={handleBotToggle}
+              disabled={renting}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                 autoBotActive ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50" 
-                : botUnlocked ? "bg-white/10 hover:bg-white/20 text-white" 
-                : "bg-white/5 text-white/30 cursor-not-allowed"
+                : botUnlocked || rentedBot ? "bg-white/10 hover:bg-white/20 text-white" 
+                : "bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/60"
               }`}
             >
-              <Bot className="w-4 h-4" />
-              {autoBotActive ? "Auto-Bot Active" : "Enable Auto-Bot"}
+              {renting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bot className="w-4 h-4" />}
+              {renting ? "Processing 50 USDT..." : autoBotActive ? "Auto-Bot Active" : (botUnlocked || rentedBot) ? "Enable Auto-Bot" : "Rent Auto-Bot"}
             </button>
           </div>
         </div>

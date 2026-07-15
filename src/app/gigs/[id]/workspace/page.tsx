@@ -119,6 +119,16 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
           
           {/* Kanban Board */}
           <div className="glass-card" style={{ padding: 'var(--space-6)', overflowX: 'auto' }}>
+            <div className="card" style={{ padding: 'var(--space-4)', marginBottom: 'var(--space-6)', border: '1px solid var(--color-accent-primary)', background: 'rgba(56, 189, 248, 0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--color-accent-primary)', boxShadow: '0 0 10px var(--color-accent-primary)' }}></div>
+                <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--color-accent-primary)' }}>🤖 Task Manager Agent Active</h3>
+              </div>
+              <p style={{ color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
+                Monitoring deliverables and escrow status. The agent automatically verifies work and releases milestone payments when tasks reach the <strong>DONE</strong> column.
+              </p>
+            </div>
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
               <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700 }}>Task Board</h2>
               {tasks.length === 0 && (

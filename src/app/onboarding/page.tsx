@@ -101,6 +101,10 @@ export default function OnboardingPage() {
                   Connections are verified via OAuth.
                 </p>
               </div>
+
+              <div className="alert alert-warning" style={{ marginTop: 'var(--space-2)' }}>
+                <strong>🌱 New to Freelancing?</strong> If you don't upload a CV or connect socials, you can still <strong>Start from Scratch</strong>. You will begin with a Credibility Score of 0 and can build your reputation by completing gigs!
+              </div>
             </div>
           )}
 

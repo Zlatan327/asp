@@ -48,8 +48,20 @@ export async function POST(req: Request) {
         }))
       };
 
-      // Trigger the Scout Agent to generate the profile
-      const scoutReport = await scoutAgent.analyzeProfile(rawData);
+      // Trigger the Scout Agent to generate the profile or use defaults if empty
+      let scoutReport;
+      if (!cvFile && socials.length === 0) {
+        scoutReport = {
+          skills: [],
+          experiences: [],
+          education: [],
+          credibilityScore: 0,
+          badges: [],
+          narrative: "Started from scratch without uploading a CV or linking social accounts. Reputation is ready to be built from zero."
+        };
+      } else {
+        scoutReport = await scoutAgent.analyzeProfile(rawData);
+      }
 
       // Create or update the Freelancer Profile
       await prisma.freelancerProfile.upsert({
