@@ -67,6 +67,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const checkConnection = async () => {
     try {
+      if (typeof window !== 'undefined' && localStorage.getItem('userDisconnected') === 'true') {
+        return;
+      }
+      
       const provider = getWindowProvider();
       if (!provider) return;
 
@@ -83,6 +87,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const connectWallet = async () => {
     setIsConnecting(true);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('userDisconnected');
+    }
     try {
       const provider = getWindowProvider();
       if (!provider) {
@@ -151,6 +158,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const disconnect = () => {
     setAddress(null);
     setChainId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userDisconnected', 'true');
+    }
   };
 
   const signMessage = async (message: string) => {
