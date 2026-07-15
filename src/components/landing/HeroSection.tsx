@@ -52,8 +52,8 @@ export default function HeroSection() {
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
-              <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-text-primary)' }}>1,000</span>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>USDT Locked</span>
+              <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-text-primary)' }}>Zero</span>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Counterparty Risk</span>
             </div>
           </div>
 
@@ -72,8 +72,8 @@ export default function HeroSection() {
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-2)' }}>
-              <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-text-primary)' }}>98<span style={{ fontSize: 'var(--text-lg)', color: 'var(--color-text-tertiary)' }}>/100</span></span>
-              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Global Rank</span>
+              <span style={{ fontSize: 'var(--text-2xl)', fontWeight: 900, color: 'var(--color-text-primary)' }}>100%</span>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Verifiable Identity</span>
             </div>
           </div>
 
