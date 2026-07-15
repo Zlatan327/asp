@@ -27,12 +27,23 @@ export default function OnboardingPage() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error('Onboarding failed');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          throw new Error('Unauthorized');
+        }
+        throw new Error(errorData.error || errorData.details || 'Onboarding failed');
+      }
 
       router.push('/dashboard');
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Failed to save profile');
+      if (err.message === 'Unauthorized') {
+        alert('Your session has expired or is invalid (e.g. database was reset). Please log in again.');
+        window.location.href = '/login';
+        return;
+      }
+      alert('Failed to save profile: ' + (err.message || String(err)));
     } finally {
       setLoading(false);
     }
