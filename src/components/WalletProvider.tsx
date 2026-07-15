@@ -40,7 +40,16 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       });
     }
 
+    // Catch OKX Wallet unhandled rejections globally so Next.js doesn't show the error overlay
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason && event.reason.code === 4900) {
+        event.preventDefault(); // Suppress the Next.js overlay
+      }
+    };
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
     return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       if (provider && provider.removeListener) {
         provider.removeListener('accountsChanged', () => {});
         provider.removeListener('chainChanged', () => {});
@@ -93,7 +102,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err: any) {
       console.error('Connection failed', err);
-      alert(err.message || 'Failed to connect wallet');
+      if (err.code !== 4900) {
+        alert(err.message || 'Failed to connect wallet');
+      }
     } finally {
       setIsConnecting(false);
     }

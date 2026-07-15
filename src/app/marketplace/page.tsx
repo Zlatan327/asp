@@ -65,47 +65,62 @@ export default function MarketplacePage() {
 
   return (
     <div style={{ minHeight: '100vh', padding: 'var(--space-8)' }}>
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 'var(--space-8)' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-12)', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: 'var(--space-8)' }}>
           <div>
-            <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Marketplace</h1>
-            <p style={{ color: 'var(--color-text-secondary)' }}>Find your next Web3 gig and apply with AI.</p>
+            <h1 style={{ fontSize: 'var(--text-4xl)', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: 'var(--space-2)' }}>Marketplace</h1>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-lg)' }}>Find your next gig.</p>
           </div>
-          <Link href="/gigs/new" className="btn btn-primary">
+          <Link href="/gigs/new" className="btn btn-primary btn-lg" style={{ borderRadius: 'var(--radius-md)' }}>
             Post a Gig
           </Link>
         </header>
 
-        <div style={{ display: 'flex', gap: 'var(--space-6)' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-12)' }}>
           {/* Filters Sidebar */}
-          <aside style={{ width: 250, flexShrink: 0 }}>
-            <div className="glass-card" style={{ padding: 'var(--space-4)' }}>
-              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 700, marginBottom: 'var(--space-4)' }}>Filters</h3>
+          <aside style={{ width: 240, flexShrink: 0 }}>
+            <div style={{ position: 'sticky', top: '100px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-6)' }}>
+                <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-primary)' }}>Filters</h3>
+                {(filters.budgetTypeFixed || filters.budgetTypeHourly || filters.expBeginner || filters.expIntermediate || filters.expExpert) && (
+                  <button 
+                    onClick={() => setFilters({ budgetTypeFixed: false, budgetTypeHourly: false, expBeginner: false, expIntermediate: false, expExpert: false })}
+                    style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textDecoration: 'underline' }}
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
               
-              <div style={{ marginBottom: 'var(--space-4)' }}>
-                <label style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Budget Type</label>
-                <div style={{ marginTop: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" checked={filters.budgetTypeFixed} onChange={e => setFilters({...filters, budgetTypeFixed: e.target.checked})} /> Fixed Price
+              <div style={{ marginBottom: 'var(--space-8)' }}>
+                <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-text-tertiary)', marginBottom: 'var(--space-4)' }}>Budget Type</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={filters.budgetTypeFixed} onChange={e => setFilters({...filters, budgetTypeFixed: e.target.checked})} style={{ width: 16, height: 16, accentColor: '#ffffff' }} /> 
+                    <span style={{ color: filters.budgetTypeFixed ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>Fixed Price</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" checked={filters.budgetTypeHourly} onChange={e => setFilters({...filters, budgetTypeHourly: e.target.checked})} /> Hourly Rate
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={filters.budgetTypeHourly} onChange={e => setFilters({...filters, budgetTypeHourly: e.target.checked})} style={{ width: 16, height: 16, accentColor: '#ffffff' }} /> 
+                    <span style={{ color: filters.budgetTypeHourly ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>Hourly Rate</span>
                   </label>
                 </div>
               </div>
 
               <div>
-                <label style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>Experience</label>
-                <div style={{ marginTop: 'var(--space-2)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" checked={filters.expBeginner} onChange={e => setFilters({...filters, expBeginner: e.target.checked})} /> Beginner
+                <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 500, color: 'var(--color-text-tertiary)', marginBottom: 'var(--space-4)' }}>Experience Level</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={filters.expBeginner} onChange={e => setFilters({...filters, expBeginner: e.target.checked})} style={{ width: 16, height: 16, accentColor: '#ffffff' }} /> 
+                    <span style={{ color: filters.expBeginner ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>Beginner</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" checked={filters.expIntermediate} onChange={e => setFilters({...filters, expIntermediate: e.target.checked})} /> Intermediate
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={filters.expIntermediate} onChange={e => setFilters({...filters, expIntermediate: e.target.checked})} style={{ width: 16, height: 16, accentColor: '#ffffff' }} /> 
+                    <span style={{ color: filters.expIntermediate ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>Intermediate</span>
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--text-sm)' }}>
-                    <input type="checkbox" checked={filters.expExpert} onChange={e => setFilters({...filters, expExpert: e.target.checked})} /> Expert
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', fontSize: 'var(--text-sm)', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={filters.expExpert} onChange={e => setFilters({...filters, expExpert: e.target.checked})} style={{ width: 16, height: 16, accentColor: '#ffffff' }} /> 
+                    <span style={{ color: filters.expExpert ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>Expert</span>
                   </label>
                 </div>
               </div>
@@ -115,43 +130,44 @@ export default function MarketplacePage() {
           {/* Gig List */}
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             {loading ? (
-              <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-tertiary)' }}>
-                Loading gigs...
+              <div style={{ padding: 'var(--space-8)', color: 'var(--color-text-tertiary)' }}>
+                Loading...
               </div>
             ) : filteredGigs.length === 0 ? (
-              <div className="card" style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--color-text-tertiary)' }}>
+              <div style={{ padding: 'var(--space-8)', color: 'var(--color-text-tertiary)', border: '1px dashed var(--color-border-subtle)', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
                 No active gigs found matching your filters.
               </div>
             ) : (
               filteredGigs.map((gig) => (
-                <Link key={gig.id} href={`/gigs/${gig.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div className="card card-interactive" style={{ padding: 'var(--space-6)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-4)' }}>
-                      <div>
-                        <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: 'var(--space-1)' }}>{gig.title}</h2>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>
-                          Posted by {gig.client?.name || 'Anonymous'} • {new Date(gig.createdAt).toLocaleDateString()}
-                        </div>
+                <Link key={gig.id} href={`/gigs/${gig.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                  <div className="card" style={{ padding: 'var(--space-6)', display: 'flex', gap: 'var(--space-6)', transition: 'background 0.2s', background: 'var(--color-bg-card)', borderRadius: 'var(--radius-md)' }} onMouseOver={e => e.currentTarget.style.background = 'var(--color-bg-card-hover)'} onMouseOut={e => e.currentTarget.style.background = 'var(--color-bg-card)'}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
+                        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 500 }}>{gig.title}</h2>
+                        <span style={{ fontSize: 'var(--text-xs)', padding: '2px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.05)', color: 'var(--color-text-secondary)' }}>{gig.experienceLevel}</span>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-accent-primary)' }}>
-                          {gig.budget} {gig.currency}
-                        </div>
-                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textTransform: 'uppercase' }}>
-                          {gig.budgetType}
-                        </div>
+                      <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.6 }}>
+                        {gig.description}
+                      </p>
+                      <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                        {JSON.parse(gig.skills || '[]').map((skill: string) => (
+                          <span key={skill} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>#{skill}</span>
+                        ))}
                       </div>
                     </div>
-
-                    <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                      {gig.description}
-                    </p>
-
-                    <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                      <span className="badge badge-info">{gig.experienceLevel}</span>
-                      {JSON.parse(gig.skills || '[]').map((skill: string) => (
-                        <span key={skill} className="skill-tag">{skill}</span>
-                      ))}
+                    
+                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '120px' }}>
+                      <div>
+                        <div style={{ fontSize: 'var(--text-lg)', fontWeight: 500, color: 'var(--color-text-primary)' }}>
+                          {gig.budget} {gig.currency}
+                        </div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: '4px' }}>
+                          {gig.budgetType === 'FIXED' ? 'Fixed Price' : 'Hourly'}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>
+                        {new Date(gig.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      </div>
                     </div>
                   </div>
                 </Link>
