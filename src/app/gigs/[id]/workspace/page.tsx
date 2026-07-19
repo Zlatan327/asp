@@ -1,25 +1,36 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import EscrowPanel from '@/components/EscrowPanel';
+import type { GigTask, TaskStatus } from '@/types';
+
+type WorkspaceGig = {
+  id: string;
+  clientId: string;
+  freelancerId: string | null;
+  title: string;
+  budget: number;
+  status: string;
+  escrowContractAddress: string | null;
+  freelancer?: {
+    id: string;
+    walletAddress?: string | null;
+  } | null;
+};
 
 export default function GigWorkspacePage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const router = useRouter();
   const { data: session } = useSession();
   
-  const [gig, setGig] = useState<any>(null);
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [gig, setGig] = useState<WorkspaceGig | null>(null);
+  const [tasks, setTasks] = useState<GigTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, [unwrappedParams.id]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const gigRes = await fetch(`/api/gigs/${unwrappedParams.id}`);
       const gigData = await gigRes.json();
@@ -34,7 +45,11 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
     } finally {
       setLoading(false);
     }
-  };
+  }, [unwrappedParams.id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleGenerateTasks = async () => {
     setGenerating(true);
@@ -43,16 +58,16 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
         method: 'POST'
       });
       if (!res.ok) throw new Error('Failed to generate tasks');
-      const newTasks = await res.json();
+      const newTasks = await res.json() as GigTask[];
       setTasks(prev => [...prev, ...newTasks]);
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to generate tasks');
     } finally {
       setGenerating(false);
     }
   };
 
-  const handleUpdateTaskStatus = async (taskId: string, newStatus: string) => {
+  const handleUpdateTaskStatus = async (taskId: string, newStatus: TaskStatus) => {
     try {
       setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
       
@@ -62,8 +77,8 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
         body: JSON.stringify({ status: newStatus })
       });
       if (!res.ok) throw new Error('Failed to update status');
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to update status');
       fetchData(); // revert
     }
   };
@@ -95,7 +110,7 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
     );
   }
 
-  const columns = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
+  const columns: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
 
   return (
     <div style={{ minHeight: '100vh', padding: 'var(--space-8)' }}>

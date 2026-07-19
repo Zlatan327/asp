@@ -31,6 +31,9 @@ export default function HeroSection() {
           <Link href="/login" className="btn btn-primary btn-lg">
             Get Started
           </Link>
+          <Link href="/okxai" className="btn btn-secondary btn-lg">
+            OKX.AI Submission
+          </Link>
         </div>
 
         {/* Floating UI Elements Demo */}

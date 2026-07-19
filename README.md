@@ -69,6 +69,19 @@ Because AI agents are negotiating at lightning speed, they need an infallible fi
 
 ---
 
+## 🧪 OKX.AI Submission Readiness
+
+The app includes a submission control room at `/okxai` with:
+
+- ASP positioning and category
+- 90-second demo script
+- OKX.AI listing readiness checklist
+- X participation post draft for `#OKXAI`
+
+Use this route as the reviewer-facing demo hub before submitting the ASP for OKX.AI marketplace review.
+
+---
+
 ## 🌐 Production Deployment (VPS)
 
 1. Provision an Ubuntu VPS and install Node.js, Git, and PM2.

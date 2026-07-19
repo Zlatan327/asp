@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && npx prisma db push && npx hardhat compile && next build",
+    "build": "prisma generate && next build",
+    "db:push": "prisma db push",
+    "contracts:compile": "hardhat compile",
     "start": "next start",
     "lint": "eslint"
   },

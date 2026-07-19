@@ -3,10 +3,6 @@ import { prisma } from "@/lib/db/prisma";
 import { auth } from "@/auth";
 import { MockZKProvider } from "@/lib/verification";
 import { ethers } from "ethers";
-import BountyPoolArtifact from "../../../../../../artifacts/contracts/BountyPool.sol/BountyPool.json";
-
-// In production, load this securely from env.
-const BOUNTY_POOL_ADDRESS = "0x6d4E3c53F602706f56CE6CDBd280D9b44Ef4Cb33";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -44,7 +40,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     // 3. Generate a backend signature for the user to claim on-chain themselves
-    let txHash = null;
+    const txHash = null;
     let signature = "";
     try {
       const privateKey = process.env.PRIVATE_KEY;
