@@ -1,8 +1,10 @@
 import { ethers } from "ethers";
-import EscrowFactoryArtifact from "../../../artifacts/contracts/Escrow.sol/EscrowFactory.json";
-import GigEscrowArtifact from "../../../artifacts/contracts/Escrow.sol/GigEscrow.json";
-import ReputationSBTArtifact from "../../../artifacts/contracts/ReputationSBT.sol/ReputationSBT.json";
-import TestUSDTArtifact from "../../../artifacts/contracts/mock/TestUSDT.sol/TestUSDT.json";
+import {
+  ESCROW_FACTORY_ABI,
+  GIG_ESCROW_ABI,
+  REPUTATION_SBT_ABI,
+  TEST_USDT_ABI,
+} from "./config";
 
 // We use the environment variables, but for client-side we need to expose them via NEXT_PUBLIC_
 // Since these are server-only by default in .env, we should hardcode testnet fallbacks for development
@@ -49,7 +51,7 @@ export const EscrowService = {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     
-    const factory = new ethers.Contract(ESCROW_FACTORY_ADDRESS, EscrowFactoryArtifact.abi, signer);
+    const factory = new ethers.Contract(ESCROW_FACTORY_ADDRESS, ESCROW_FACTORY_ABI, signer);
     
     // amount should be converted to wei (assume USDT has 18 decimals in our mock)
     const amountWei = ethers.parseEther(amount);
@@ -58,13 +60,13 @@ export const EscrowService = {
     const receipt = await tx.wait();
     
     // Find the EscrowCreated event to extract the child escrow address
-    const event = receipt?.logs.find((log: any) => log.fragment?.name === 'EscrowCreated');
+    const event = receipt?.logs.find((log: ethers.EventLog | ethers.Log) => "fragment" in log && log.fragment?.name === "EscrowCreated");
     if (event && event.args) {
       return event.args[0]; // escrowAddress
     }
     
     // Fallback if event parsing fails (should query the factory for the latest client escrow)
-    const clientEscrows = await factory.getClientEscrows(signer.address);
+    const clientEscrows = await factory.getClientEscrows(await signer.getAddress());
     return clientEscrows[clientEscrows.length - 1];
   },
 
@@ -74,14 +76,14 @@ export const EscrowService = {
     const signer = await provider.getSigner();
     
     // 1. Approve USDT
-    const usdt = new ethers.Contract(USDT_ADDRESS, TestUSDTArtifact.abi, signer);
+    const usdt = new ethers.Contract(USDT_ADDRESS, TEST_USDT_ABI, signer);
     const amountWei = ethers.parseEther(amount);
     
     const approveTx = await usdt.approve(escrowAddress, amountWei);
     await approveTx.wait();
     
     // 2. Fund
-    const escrow = new ethers.Contract(escrowAddress, GigEscrowArtifact.abi, signer);
+    const escrow = new ethers.Contract(escrowAddress, GIG_ESCROW_ABI, signer);
     const fundTx = await escrow.fundEscrow();
     await fundTx.wait();
     
@@ -93,7 +95,7 @@ export const EscrowService = {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     
-    const escrow = new ethers.Contract(escrowAddress, GigEscrowArtifact.abi, signer);
+    const escrow = new ethers.Contract(escrowAddress, GIG_ESCROW_ABI, signer);
     const tx = await escrow.releaseMilestone(milestoneIndex);
     await tx.wait();
     
@@ -105,7 +107,7 @@ export const EscrowService = {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     
-    const escrow = new ethers.Contract(escrowAddress, GigEscrowArtifact.abi, signer);
+    const escrow = new ethers.Contract(escrowAddress, GIG_ESCROW_ABI, signer);
     const tx = await escrow.requestRelease(milestoneIndex);
     await tx.wait();
     
@@ -117,7 +119,7 @@ export const EscrowService = {
     const provider = await getProvider();
     const signer = await provider.getSigner();
     
-    const usdt = new ethers.Contract(USDT_ADDRESS, TestUSDTArtifact.abi, signer);
+    const usdt = new ethers.Contract(USDT_ADDRESS, TEST_USDT_ABI, signer);
     const amountWei = ethers.parseEther(amount);
     
     const tx = await usdt.mint(signer.address, amountWei);
@@ -129,14 +131,14 @@ export const EscrowService = {
   // Reputation SBT
   async checkHasReputationSBT(userAddress: string) {
     const provider = await getProvider();
-    const sbt = new ethers.Contract(REPUTATION_SBT_ADDRESS, ReputationSBTArtifact.abi, provider);
+    const sbt = new ethers.Contract(REPUTATION_SBT_ADDRESS, REPUTATION_SBT_ABI, provider);
     return await sbt.hasReputation(userAddress);
   },
 
   async mintReputationSBT(userAddress: string, tokenURI: string) {
     const provider = await getProvider();
     const signer = await provider.getSigner();
-    const sbt = new ethers.Contract(REPUTATION_SBT_ADDRESS, ReputationSBTArtifact.abi, signer);
+    const sbt = new ethers.Contract(REPUTATION_SBT_ADDRESS, REPUTATION_SBT_ABI, signer);
     
     const tx = await sbt.mint(userAddress, tokenURI);
     await tx.wait();
@@ -146,7 +148,7 @@ export const EscrowService = {
   async updateReputationSBT(userAddress: string, tokenURI: string) {
     const provider = await getProvider();
     const signer = await provider.getSigner();
-    const sbt = new ethers.Contract(REPUTATION_SBT_ADDRESS, ReputationSBTArtifact.abi, signer);
+    const sbt = new ethers.Contract(REPUTATION_SBT_ADDRESS, REPUTATION_SBT_ABI, signer);
     
     const tokenId = await sbt.getReputation(userAddress);
     const tx = await sbt.updateReputation(tokenId, tokenURI);

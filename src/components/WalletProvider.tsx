@@ -1,7 +1,18 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+
+type InjectedWalletProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  on?: (event: 'accountsChanged' | 'chainChanged', listener: (...args: unknown[]) => void) => void;
+  removeListener?: (event: 'accountsChanged' | 'chainChanged', listener: (...args: unknown[]) => void) => void;
+};
+
+type WalletWindow = Window & {
+  okxwallet?: InjectedWalletProvider;
+  ethereum?: InjectedWalletProvider;
+};
 
 interface WalletContextType {
   address: string | null;
@@ -24,48 +35,17 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [chainId, setChainId] = useState<number | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
 
-  // Auto-connect if already authorized
-  useEffect(() => {
-    checkConnection();
+  const getWindowProvider = useCallback((): InjectedWalletProvider | null => {
+    if (typeof window === 'undefined') return null;
+    const walletWindow = window as WalletWindow;
 
-    // Listeners
-    const provider = getWindowProvider();
-    if (provider) {
-      provider.on('accountsChanged', (accounts: string[]) => {
-        if (accounts.length > 0) setAddress(accounts[0]);
-        else setAddress(null);
-      });
-      provider.on('chainChanged', (chainIdHex: string) => {
-        setChainId(parseInt(chainIdHex, 16));
-      });
-    }
-
-    // Catch OKX Wallet unhandled rejections globally so Next.js doesn't show the error overlay
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      if (event.reason && event.reason.code === 4900) {
-        event.preventDefault(); // Suppress the Next.js overlay
-      }
-    };
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-      if (provider && provider.removeListener) {
-        provider.removeListener('accountsChanged', () => {});
-        provider.removeListener('chainChanged', () => {});
-      }
-    };
+    // Prefer OKX Wallet if injected
+    if (walletWindow.okxwallet) return walletWindow.okxwallet;
+    if (walletWindow.ethereum) return walletWindow.ethereum;
+    return null;
   }, []);
 
-  const getWindowProvider = () => {
-    if (typeof window === 'undefined') return null;
-    // Prefer OKX Wallet if injected
-    if ((window as any).okxwallet) return (window as any).okxwallet;
-    if ((window as any).ethereum) return (window as any).ethereum;
-    return null;
-  };
-
-  const checkConnection = async () => {
+  const checkConnection = useCallback(async () => {
     try {
       if (typeof window !== 'undefined' && localStorage.getItem('userDisconnected') === 'true') {
         return;
@@ -74,16 +54,49 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const provider = getWindowProvider();
       if (!provider) return;
 
-      const accounts = await provider.request({ method: 'eth_accounts' });
+      const accounts = await provider.request({ method: 'eth_accounts' }) as string[];
       if (accounts.length > 0) {
         setAddress(accounts[0]);
-        const currentChain = await provider.request({ method: 'eth_chainId' });
+        const currentChain = await provider.request({ method: 'eth_chainId' }) as string;
         setChainId(parseInt(currentChain, 16));
       }
     } catch (err) {
       console.error('Failed to check connection', err);
     }
-  };
+  }, [getWindowProvider]);
+
+  // Auto-connect if already authorized
+  useEffect(() => {
+    checkConnection();
+
+    const provider = getWindowProvider();
+    const handleAccountsChanged = (accounts: unknown) => {
+      const nextAccounts = Array.isArray(accounts) ? accounts : [];
+      setAddress(typeof nextAccounts[0] === 'string' ? nextAccounts[0] : null);
+    };
+    const handleChainChanged = (chainIdHex: unknown) => {
+      if (typeof chainIdHex === 'string') {
+        setChainId(parseInt(chainIdHex, 16));
+      }
+    };
+
+    provider?.on?.('accountsChanged', handleAccountsChanged);
+    provider?.on?.('chainChanged', handleChainChanged);
+
+    // Catch OKX Wallet unhandled rejections globally so Next.js doesn't show the error overlay
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason && typeof event.reason === 'object' && 'code' in event.reason && event.reason.code === 4900) {
+        event.preventDefault(); // Suppress the Next.js overlay
+      }
+    };
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      provider?.removeListener?.('accountsChanged', handleAccountsChanged);
+      provider?.removeListener?.('chainChanged', handleChainChanged);
+    };
+  }, [checkConnection, getWindowProvider]);
 
   const connectWallet = async () => {
     setIsConnecting(true);
@@ -109,10 +122,10 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         // Some older wallets might not support this RPC method, ignore and proceed
       }
 
-      const accounts = await provider.request({ method: 'eth_requestAccounts' });
+      const accounts = await provider.request({ method: 'eth_requestAccounts' }) as string[];
       setAddress(accounts[0]);
 
-      const currentChain = await provider.request({ method: 'eth_chainId' });
+      const currentChain = await provider.request({ method: 'eth_chainId' }) as string;
       const currentChainId = parseInt(currentChain, 16);
       setChainId(currentChainId);
 

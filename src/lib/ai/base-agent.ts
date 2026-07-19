@@ -16,7 +16,7 @@ export abstract class BaseAgent {
     const startTime = Date.now();
     let status = 'SUCCESS';
     let outputData: string | null = null;
-    let inputData = JSON.stringify({ prompt, context });
+    const inputData = JSON.stringify({ prompt, context });
 
     try {
       const fullPrompt = context
@@ -46,7 +46,7 @@ export abstract class BaseAgent {
     const startTime = Date.now();
     let status = 'SUCCESS';
     let outputData: string | null = null;
-    let inputData = JSON.stringify({ prompt, context });
+    const inputData = JSON.stringify({ prompt, context });
 
     try {
       const fullPrompt = context

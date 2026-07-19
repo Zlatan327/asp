@@ -30,7 +30,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       where: { gigId: id },
       orderBy: { order: 'desc' }
     });
-    let orderOffset = lastTask ? lastTask.order + 1 : 0;
+    const orderOffset = lastTask ? lastTask.order + 1 : 0;
 
     // Create tasks in DB
     const creations = generatedTasks.map((t, index) => {

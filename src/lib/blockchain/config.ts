@@ -28,12 +28,11 @@ export const ERC20_ABI = [
  * Escrow contract ABI
  */
 export const ESCROW_FACTORY_ABI = [
-  'function createEscrow(address client, address freelancer, address token, uint256 totalAmount, uint256 milestoneCount) returns (address)',
-  'function getEscrow(uint256 index) view returns (address)',
+  'function createEscrow(address freelancer, address token, uint256 totalAmount, uint256 milestoneCount) returns (address)',
   'function getEscrowCount() view returns (uint256)',
-  'function getEscrowsByClient(address client) view returns (address[])',
-  'function getEscrowsByFreelancer(address freelancer) view returns (address[])',
-  'event EscrowCreated(address indexed escrow, address indexed client, address indexed freelancer, uint256 totalAmount)',
+  'function getClientEscrows(address client) view returns (address[])',
+  'function getFreelancerEscrows(address freelancer) view returns (address[])',
+  'event EscrowCreated(address indexed escrowAddress, address indexed client, address indexed freelancer, address token, uint256 totalAmount, uint256 milestoneCount, uint256 timestamp)',
 ] as const;
 
 export const GIG_ESCROW_ABI = [
@@ -43,31 +42,36 @@ export const GIG_ESCROW_ABI = [
   'function disputeMilestone(uint256 index) external',
   'function resolveDispute(uint256 index, address winner) external',
   'function refund() external',
-  'function getStatus() view returns (uint8)',
-  'function getMilestone(uint256 index) view returns (uint256 amount, uint8 status, uint256 releasedAt)',
+  'function state() view returns (uint8)',
+  'function getMilestoneCount() view returns (uint256)',
+  'function getMilestone(uint256 index) view returns (tuple(uint256 amount, uint8 status, uint256 createdAt, uint256 releasedAt, uint256 disputedAt, uint256 resolvedAt))',
   'function client() view returns (address)',
   'function freelancer() view returns (address)',
-  'function token() view returns (address)',
+  'function paymentToken() view returns (address)',
   'function totalAmount() view returns (uint256)',
-  'function milestoneCount() view returns (uint256)',
-  'function isFunded() view returns (bool)',
-  'event EscrowFunded(uint256 amount)',
-  'event MilestoneReleased(uint256 indexed index, uint256 amount)',
-  'event MilestoneDisputed(uint256 indexed index, address disputedBy)',
-  'event DisputeResolved(uint256 indexed index, address winner, uint256 amount)',
-  'event EscrowRefunded(uint256 amount)',
-  'event ReleaseRequested(uint256 indexed index, address requestedBy)',
+  'event EscrowFunded(address indexed client, uint256 amount, uint256 timestamp)',
+  'event MilestoneReleased(uint256 indexed milestoneIndex, uint256 amount, uint256 timestamp)',
+  'event MilestoneDisputed(uint256 indexed milestoneIndex, address indexed disputedBy, uint256 timestamp)',
+  'event DisputeResolved(uint256 indexed milestoneIndex, address indexed winner, uint256 amount, uint256 timestamp)',
+  'event EscrowRefunded(address indexed client, uint256 amount, uint256 timestamp)',
+  'event MilestoneReleaseRequested(uint256 indexed milestoneIndex, uint256 timestamp)',
 ] as const;
 
 export const REPUTATION_SBT_ABI = [
-  'function mint(address to, string memory uri) external returns (uint256)',
-  'function updateReputation(uint256 tokenId, string memory newUri) external',
-  'function getReputation(address user) view returns (uint256 tokenId, string memory uri)',
+  'function mint(address user, string uri) external returns (uint256)',
+  'function updateReputation(uint256 tokenId, string newUri) external',
+  'function getReputation(address user) view returns (uint256)',
+  'function hasReputation(address user) view returns (bool)',
   'function tokenURI(uint256 tokenId) view returns (string)',
   'function balanceOf(address owner) view returns (uint256)',
   'function ownerOf(uint256 tokenId) view returns (address)',
-  'event ReputationMinted(address indexed user, uint256 indexed tokenId)',
-  'event ReputationUpdated(uint256 indexed tokenId, string newUri)',
+  'event ReputationMinted(address indexed user, uint256 indexed tokenId, string uri, uint256 timestamp)',
+  'event ReputationUpdated(uint256 indexed tokenId, string newUri, uint256 timestamp)',
+] as const;
+
+export const TEST_USDT_ABI = [
+  ...ERC20_ABI,
+  'function mint(address to, uint256 amount) external',
 ] as const;
 
 /**
