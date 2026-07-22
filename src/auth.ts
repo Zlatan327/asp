@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import TwitterProvider from "next-auth/providers/twitter";
+import DiscordProvider from "next-auth/providers/discord";
 
 import CredentialsProvider from "next-auth/providers/credentials";
 import { SiweMessage } from "siwe";
@@ -11,13 +12,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   providers: [
-    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET ? [GithubProvider({
+    ...(process.env.ENABLE_SOCIAL_LOGIN === 'true' && process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET ? [GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
     })] : []),
-    ...(process.env.TWITTER_CLIENT_ID && process.env.TWITTER_CLIENT_SECRET ? [TwitterProvider({
+    ...(process.env.ENABLE_SOCIAL_LOGIN === 'true' && process.env.TWITTER_CLIENT_ID && process.env.TWITTER_CLIENT_SECRET ? [TwitterProvider({
       clientId: process.env.TWITTER_CLIENT_ID,
       clientSecret: process.env.TWITTER_CLIENT_SECRET,
+    })] : []),
+    ...(process.env.ENABLE_SOCIAL_LOGIN === 'true' && process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET ? [DiscordProvider({
+      clientId: process.env.DISCORD_CLIENT_ID,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET,
     })] : []),
 
     CredentialsProvider({
