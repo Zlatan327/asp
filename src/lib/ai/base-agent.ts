@@ -74,10 +74,10 @@ export abstract class BaseAgent {
     try {
       await prisma.agentLog.create({
         data: {
-          agentType: this.type,
+          agentType: this.type as any,
           action: `Execute`,
           input: input.slice(0, 5000), // truncate to prevent massive logs
-          output: output ? output.slice(0, 5000) : null,
+          output: output ? output.slice(0, 5000) : (null as any),
           status,
           duration: durationMs,
         },

@@ -54,7 +54,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
 
     const currentRep = await prisma.reputation.findUnique({ where: { userId: gig.freelancerId } });
-    const history = currentRep && currentRep.history ? safeParseJson(currentRep.history, []) : [];
+    const history = currentRep && currentRep.history ? safeParseJson<any[]>(currentRep.history, []) : [];
     history.push(metadata);
 
     // Save score to DB

@@ -2,10 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 import Link from 'next/link';
-
-const safeParse = (str: string | null | undefined, fallback: any = []) => {
-  try { return str ? JSON.parse(str) : fallback; } catch (e) { return fallback; }
-};
+import { safeParseJson } from '@/lib/json';
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -110,7 +107,7 @@ export default async function DashboardPage() {
             <div>
               <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>Verified Skills</h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
-                {safeParse(user.freelancerProfile.skills).map((skill: any) => (
+                {safeParseJson<any[]>(user.freelancerProfile.skills as any, []).map((skill: any) => (
                   <span key={skill.name} className="skill-tag">
                     {skill.name} <span style={{ opacity: 0.5, marginLeft: 4 }}>{skill.confidence}%</span>
                   </span>
@@ -129,7 +126,7 @@ export default async function DashboardPage() {
               <div>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: 'var(--space-1)' }}>Total Spent</div>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 800 }}>
-                  ${user.clientProfile.totalSpent != null ? user.clientProfile.totalSpent.toFixed(0) : 0}
+                  ${user.clientProfile.totalSpent != null ? user.clientProfile.totalSpent.toString() : '0'}
                 </div>
               </div>
               <div>
@@ -162,7 +159,7 @@ export default async function DashboardPage() {
                       <span className={`badge ${gig.status === 'OPEN' ? 'badge-info' : 'badge-warning'}`}>{gig.status}</span>
                     </div>
                     <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
-                      Budget: {gig.budget} USDT
+                      Budget: {gig.budget.toString()} USDT
                     </div>
                   </Link>
               ))}

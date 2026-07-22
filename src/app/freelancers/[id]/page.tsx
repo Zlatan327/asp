@@ -99,7 +99,7 @@ export default async function FreelancerProfilePage({ params }: { params: Promis
                   <div key={gig.id} style={{ borderBottom: '1px solid var(--color-border)', paddingBottom: 'var(--space-4)' }}>
                     <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600, marginBottom: 'var(--space-1)' }}>{gig.title}</h3>
                     <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
-                      Client: {gig.client.name} • Earned: {gig.budget} {gig.currency}
+                      Client: {gig.client.name} • Earned: {gig.budget.toString()} {gig.currency}
                     </div>
                   </div>
                 ))}
