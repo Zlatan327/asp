@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import ConnectWalletButton from './ConnectWalletButton';
 import { auth } from '@/auth';
+import { Sparkles } from 'lucide-react';
 
 export default async function Header() {
   const session = await auth();
@@ -35,6 +36,9 @@ export default async function Header() {
             </Link>
             <Link href="/bounties" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
               Bounty Hub
+            </Link>
+            <Link href="/agent-dashboard" style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-accent-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Sparkles size={14} /> Agents
             </Link>
             <Link href="/dashboard" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
               Dashboard

@@ -50,8 +50,8 @@ async function main() {
 
   // The backend verifier will be the deployer for this hackathon MVP
   console.log("Deploying BountyPool with USDT:", usdtAddress, "and Verifier:", deployer.address);
-  const BountyPool = new ethers.ContractFactory(bountyArtifact.abi, bountyArtifact.bytecode, deployer);
-  const bountyPool = await BountyPool.deploy(usdtAddress, deployer.address);
+  const BountyPoolFactory = new ethers.ContractFactory(bountyArtifact.abi, bountyArtifact.bytecode, deployer);
+  const bountyPool = await BountyPoolFactory.deploy(usdtAddress, deployer.address, deployer.address);
   await bountyPool.waitForDeployment();
   const bountyPoolAddress = await bountyPool.getAddress();
   console.log(`✅ BountyPool deployed at: ${bountyPoolAddress}`);

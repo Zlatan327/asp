@@ -33,7 +33,7 @@ describe("ASP Escrow System", function () {
 
     // Deploy EscrowFactory
     const EscrowFactory = await ethers.getContractFactory("EscrowFactory");
-    const factory = await EscrowFactory.deploy(admin.address);
+    const factory = await EscrowFactory.deploy(admin.address, admin.address);
     await factory.waitForDeployment();
 
     // Create a GigEscrow via factory (4 milestones)
@@ -598,7 +598,7 @@ describe("ASP Escrow System", function () {
       await token.mint(client.address, amount);
 
       const EscrowFactory = await ethers.getContractFactory("EscrowFactory");
-      const factory = await EscrowFactory.deploy(admin.address);
+      const factory = await EscrowFactory.deploy(admin.address, admin.address);
       await factory.waitForDeployment();
 
       await factory

@@ -57,7 +57,7 @@ export default function OKXAISubmissionPage() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
             gap: 'var(--space-8)',
             alignItems: 'center',
           }}
@@ -115,7 +115,7 @@ export default function OKXAISubmissionPage() {
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
             gap: 'var(--space-4)',
           }}
         >
@@ -148,7 +148,7 @@ export default function OKXAISubmissionPage() {
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
             gap: 'var(--space-6)',
           }}
         >
@@ -194,9 +194,10 @@ export default function OKXAISubmissionPage() {
               background: 'rgba(0,0,0,0.22)',
               border: '1px solid var(--color-border-subtle)',
               borderRadius: 'var(--radius-md)',
-              padding: 'var(--space-5)',
-              lineHeight: 1.65,
+              padding: 'var(--space-4)',
+              lineHeight: 1.5,
               overflowX: 'auto',
+              fontSize: 'var(--text-sm)',
             }}
           >
             {xPost}

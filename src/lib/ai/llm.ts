@@ -27,13 +27,13 @@ export interface LLMResponse {
 function getConfig() {
   const provider = process.env.LLM_PROVIDER || 'openai';
 
-  if (provider === 'mimo') {
-    const apiKey = process.env.MIMO_API_KEY;
-    if (!apiKey) throw new Error('MIMO_API_KEY is not set. Please configure it in your .env file.');
+  if (provider === 'google') {
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) throw new Error('GOOGLE_API_KEY is not set. Please configure it in your .env file.');
     return {
       apiKey,
-      baseUrl: process.env.MIMO_BASE_URL || 'https://api.xiaomimimo.com/v1',
-      model: process.env.MIMO_MODEL || 'mimo-v2.5-pro',
+      baseUrl: process.env.GOOGLE_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai',
+      model: process.env.GOOGLE_MODEL || 'gemini-1.5-pro',
     };
   }
 
@@ -54,7 +54,7 @@ export async function chatCompletion(
   options: LLMOptions = {}
 ): Promise<LLMResponse> {
   // --- HACKATHON DEMO MOCK ---
-  const isMocked = true;
+  const isMocked = process.env.LLM_MOCKED === 'true';
   if (isMocked) {
     await new Promise(r => setTimeout(r, 1500));
     

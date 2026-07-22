@@ -85,6 +85,7 @@ contract ReputationSBT is ERC721, ERC721URIStorage, Ownable {
      */
     function mint(address _user, string calldata _tokenURI)
         external
+        onlyOwner
         returns (uint256 tokenId)
     {
         if (_user == address(0)) revert ZeroAddress();
@@ -110,6 +111,7 @@ contract ReputationSBT is ERC721, ERC721URIStorage, Ownable {
      */
     function updateReputation(uint256 _tokenId, string calldata _newURI)
         external
+        onlyOwner
     {
         // Ensure token exists by checking owner (reverts if not minted)
         address owner = ownerOf(_tokenId);

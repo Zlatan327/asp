@@ -6,101 +6,203 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DATABASE_POSTGRES_URL_NON_POOLING")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum UserRole {
+  FREELANCER
+  CLIENT
+  BOTH
+}
+
+enum UserTier {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum GigStatus {
+  DRAFT
+  OPEN
+  PENDING_FUNDS
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum EscrowStatus {
+  PENDING
+  CREATED
+  FUNDED
+  ACTIVE
+  PARTIALLY_RELEASED
+  COMPLETED
+  DISPUTED
+  CANCELLED
+  REFUNDED
+}
+
+enum BudgetType {
+  FIXED
+  HOURLY
+}
+
+enum ExperienceLevel {
+  BEGINNER
+  ENTRY
+  INTERMEDIATE
+  SENIOR
+  EXPERT
+  ANY
+}
+
+enum AgentType {
+  SCOUT
+  MATCHER
+  PROPOSAL
+  TASK_MANAGER
+  REPUTATION
+  ORCHESTRATOR
+}
+
+enum Availability {
+  AVAILABLE
+  BUSY
+  UNAVAILABLE
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  NOT_AVAILABLE
+}
+
+enum BountyStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+}
+
+enum BountyClaimStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
 // ─── User & Auth ─────────────────────────────────────────
 
 model User {
-  id              String   @id @default(cuid())
-  walletAddress   String?  @unique
-  email           String?  @unique
-  name            String?
-  avatarUrl       String?
-  role            String   @default("BOTH") // FREELANCER, CLIENT, BOTH
-  tier            String   @default("FREE") // FREE, PRO, ENTERPRISE
-  onboardedAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String    @id @default(cuid())
+  walletAddress String?   @unique
+  email         String?   @unique
+  name          String?
+  avatarUrl     String?
+  role          UserRole  @default(BOTH)
+  tier          UserTier  @default(FREE)
+  onboardedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
   freelancerProfile FreelancerProfile?
   clientProfile     ClientProfile?
   socialAccounts    SocialAccount[]
   proposals         Proposal[]
-  gigsPosted        Gig[]             @relation("ClientGigs")
-  gigsWorked        Gig[]             @relation("FreelancerGigs")
+  gigsPosted        Gig[]              @relation("ClientGigs")
+  gigsWorked        Gig[]              @relation("FreelancerGigs")
   reputationScore   Reputation?
   agentLogs         AgentLog[]
-  sentReviews       Review[]          @relation("ReviewAuthor")
-  receivedReviews   Review[]          @relation("ReviewSubject")
+  sentReviews       Review[]           @relation("ReviewAuthor")
+  receivedReviews   Review[]           @relation("ReviewSubject")
   bountiesPosted    Bounty[]
   bountyClaims      BountyClaim[]
+
+  @@index([walletAddress])
 }
 
 // ─── Freelancer Profile ──────────────────────────────────
 
 model FreelancerProfile {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  headline          String?
-  bio               String?
-  skills            String   @default("[]") // JSON array of skills
-  experiences       String   @default("[]") // JSON array of experiences
-  education         String   @default("[]") // JSON array
-  cvFileUrl         String?
-  credibilityScore  Float    @default(0)
-  badges            String   @default("[]") // JSON array of badge IDs
-  scoutReport       String?  // JSON scout analysis
-  skillEmbedding    String?  // JSON vector for matching
-  hourlyRate        Float?
-  availability      String   @default("AVAILABLE") // AVAILABLE, BUSY, UNAVAILABLE
-  completedGigs     Int      @default(0)
-  totalEarned       Float    @default(0)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               String       @id @default(cuid())
+  userId           String       @unique
+  headline         String?
+  bio              String?
+  skills           Json         @default("[]") // JSON array of skills
+  experiences      Json         @default("[]") // JSON array of experiences
+  education        Json         @default("[]") // JSON array
+  cvFileUrl        String?
+  credibilityScore Float        @default(0)
+  badges           Json         @default("[]") // JSON array of badge IDs
+  scoutReport      Json? // JSON scout analysis
+  skillEmbedding   Json? // JSON vector for matching
+  hourlyRate       Decimal?     @db.Decimal(18, 6)
+  availability     Availability @default(AVAILABLE)
+  completedGigs    Int          @default(0)
+  totalEarned      Decimal      @default(0) @db.Decimal(18, 6)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ─── Client Profile ──────────────────────────────────────
 
 model ClientProfile {
-  id             String   @id @default(cuid())
-  userId         String   @unique
-  companyName    String?
-  industry       String?
-  description    String?
-  website        String?
-  totalSpent     Float    @default(0)
-  gigsPosted     Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  companyName String?
+  industry    String?
+  description String?
+  website     String?
+  totalSpent  Decimal  @default(0) @db.Decimal(18, 6)
+  gigsPosted  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ─── Social Accounts ─────────────────────────────────────
 
 model SocialAccount {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   userId       String
-  platform     String   // GITHUB, TWITTER, DISCORD
+  platform     String // GITHUB, TWITTER, DISCORD
   handle       String
   profileUrl   String?
   accessToken  String?
   refreshToken String?
-  verified     Boolean  @default(false)
-  scanData     String?  // JSON: latest scan results
+  verified     Boolean   @default(false)
+  scanData     Json? // JSON: latest scan results
   lastScanned  DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, platform])
+  @@index([userId])
 }
 
 // ─── Skills Taxonomy ─────────────────────────────────────
@@ -110,32 +212,32 @@ model Skill {
   name        String @unique
   category    String // PROGRAMMING, DESIGN, BLOCKCHAIN, MARKETING, etc.
   demandScore Float  @default(0)
-  aliases     String @default("[]") // JSON array of alternative names
+  aliases     Json   @default("[]") // JSON array of alternative names
 }
 
 // ─── Gigs / Tasks ────────────────────────────────────────
 
 model Gig {
-  id                   String   @id @default(cuid())
-  clientId             String
-  freelancerId         String?
-  title                String
-  description          String
-  skills               String   @default("[]") // JSON array of skill names
-  budget               Float
-  budgetType           String   @default("FIXED") // FIXED, HOURLY
-  currency             String   @default("USDT")
-  status               String   @default("OPEN") // OPEN, IN_PROGRESS, COMPLETED, CANCELLED, DISPUTED
-  deadline             DateTime?
-  milestones           String   @default("[]") // JSON array of milestones
+  id                    String          @id @default(cuid())
+  clientId              String
+  freelancerId          String?
+  title                 String
+  description           String
+  skills                Json            @default("[]") // JSON array of skill names
+  budget                Decimal         @db.Decimal(18, 6)
+  budgetType            BudgetType      @default(FIXED)
+  currency              String          @default("USDT")
+  status                GigStatus       @default(OPEN)
+  deadline              DateTime?
+  milestones            Json            @default("[]") // JSON array of milestones
   escrowContractAddress String?
-  escrowFunded         Boolean  @default(false)
-  category             String?
-  experienceLevel      String   @default("ANY") // BEGINNER, INTERMEDIATE, EXPERT, ANY
-  estimatedDuration    String?
-  matchScore           Float?   // AI match score for recommendations
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  escrowFunded          Boolean         @default(false)
+  category              String?
+  experienceLevel       ExperienceLevel @default(ANY)
+  estimatedDuration     String?
+  matchScore            Float? // AI match score for recommendations
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
 
   client     User       @relation("ClientGigs", fields: [clientId], references: [id])
   freelancer User?      @relation("FreelancerGigs", fields: [freelancerId], references: [id])
@@ -143,90 +245,105 @@ model Gig {
   tasks      Task[]
   escrow     Escrow?
   reviews    Review[]
+
+  @@index([clientId])
+  @@index([freelancerId])
+  @@index([status])
 }
 
 // ─── Proposals ───────────────────────────────────────────
 
 model Proposal {
-  id              String   @id @default(cuid())
-  gigId           String
-  freelancerId    String
-  coverLetter     String
-  bidAmount       Float
-  estimatedDays   Int?
-  generatedByAgent Boolean @default(false)
-  agentConfidence Float?
-  matchScore      Float?
-  status          String   @default("PENDING") // PENDING, ACCEPTED, REJECTED, WITHDRAWN
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String         @id @default(cuid())
+  gigId            String
+  freelancerId     String
+  coverLetter      String
+  bidAmount        Decimal        @db.Decimal(18, 6)
+  estimatedDays    Int?
+  generatedByAgent Boolean        @default(false)
+  agentConfidence  Float?
+  matchScore       Float?
+  status           ProposalStatus @default(PENDING)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   gig        Gig  @relation(fields: [gigId], references: [id], onDelete: Cascade)
   freelancer User @relation(fields: [freelancerId], references: [id])
 
   @@unique([gigId, freelancerId])
+  @@index([gigId])
+  @@index([freelancerId])
+  @@index([status])
 }
 
 // ─── Task Management ─────────────────────────────────────
 
 model Task {
-  id             String   @id @default(cuid())
+  id             String     @id @default(cuid())
   gigId          String
   title          String
   description    String?
-  status         String   @default("TODO") // TODO, IN_PROGRESS, REVIEW, DONE
+  status         TaskStatus @default(TODO)
   milestoneIndex Int?
-  deliverables   String   @default("[]") // JSON array of deliverable URLs
+  deliverables   Json       @default("[]") // JSON array of deliverable URLs
   dueDate        DateTime?
-  order          Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  order          Int        @default(0)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
   gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+  @@index([status])
 }
 
 // ─── Escrow ──────────────────────────────────────────────
 
 model Escrow {
-  id               String   @id @default(cuid())
-  gigId            String   @unique
+  id               String       @id @default(cuid())
+  gigId            String       @unique
   contractAddress  String?
-  chainId          Int      @default(196) // X Layer mainnet
-  tokenAddress     String?  // USDT contract address
-  totalAmount      Float
-  releasedAmount   Float    @default(0)
-  status           String   @default("PENDING") // PENDING, FUNDED, PARTIALLY_RELEASED, COMPLETED, DISPUTED, REFUNDED
-  milestoneDetails String   @default("[]") // JSON: per-milestone escrow status
+  chainId          Int          @default(196) // X Layer mainnet
+  tokenAddress     String? // USDT contract address
+  totalAmount      Decimal      @db.Decimal(18, 6)
+  releasedAmount   Decimal      @default(0) @db.Decimal(18, 6)
+  status           EscrowStatus @default(PENDING)
+  milestoneDetails Json         @default("[]") // JSON: per-milestone escrow status
   txHash           String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   gig Gig @relation(fields: [gigId], references: [id], onDelete: Cascade)
+
+  @@index([gigId])
+  @@index([status])
 }
 
 // ─── Reputation ──────────────────────────────────────────
 
 model Reputation {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  overallScore      Float    @default(50) // 0-100
-  profileScore      Float    @default(0)
-  socialScore       Float    @default(0)
-  completionScore   Float    @default(0)
-  ratingScore       Float    @default(0)
-  deliveryScore     Float    @default(0)
-  disputeScore      Float    @default(0)
-  socialReliabilityScore Float @default(50) // For Micro-Bounties
-  tasksCompleted    Int      @default(0)    // For unlocking Auto-Bounty Bot
-  badges            String   @default("[]") // JSON array of badge objects
-  onChainTokenId    String?
-  onChainSynced     Boolean  @default(false)
-  lastSyncedAt      DateTime?
-  history           String   @default("[]") // JSON array of score snapshots
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                     String    @id @default(cuid())
+  userId                 String    @unique
+  overallScore           Float     @default(50) // 0-100
+  profileScore           Float     @default(0)
+  socialScore            Float     @default(0)
+  completionScore        Float     @default(0)
+  ratingScore            Float     @default(0)
+  deliveryScore          Float     @default(0)
+  disputeScore           Float     @default(0)
+  socialReliabilityScore Float     @default(50) // For Micro-Bounties
+  tasksCompleted         Int       @default(0) // For unlocking Auto-Bounty Bot
+  badges                 Json      @default("[]") // JSON array of badge objects
+  onChainTokenId         String?
+  onChainSynced          Boolean   @default(false)
+  lastSyncedAt           DateTime?
+  history                Json      @default("[]") // JSON array of score snapshots
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ─── Reviews ─────────────────────────────────────────────
@@ -236,7 +353,7 @@ model Review {
   gigId     String
   authorId  String
   subjectId String
-  rating    Float    // 1-5
+  rating    Float // 1-5
   comment   String?
   createdAt DateTime @default(now())
 
@@ -245,62 +362,74 @@ model Review {
   subject User @relation("ReviewSubject", fields: [subjectId], references: [id])
 
   @@unique([gigId, authorId])
+  @@index([gigId])
+  @@index([authorId])
+  @@index([subjectId])
 }
 
 // ─── Agent Logs ──────────────────────────────────────────
 
 model AgentLog {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String?
-  agentType String   // SCOUT, MATCHER, PROPOSAL, TASK_MANAGER, REPUTATION, ORCHESTRATOR
+  agentType AgentType
   action    String
-  input     String?  // JSON
-  output    String?  // JSON
-  status    String   @default("SUCCESS") // SUCCESS, ERROR, PENDING
-  duration  Int?     // milliseconds
-  cost      Float?   // LLM API cost
-  createdAt DateTime @default(now())
+  input     Json?
+  output    Json?
+  status    String    @default("SUCCESS") // SUCCESS, ERROR, PENDING
+  duration  Int? // milliseconds
+  cost      Decimal?  @db.Decimal(18, 6) // LLM API cost
+  createdAt DateTime  @default(now())
 
   user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([agentType])
 }
 
 // ─── Micro-Bounties (Social) ─────────────────────────────
 
 model Bounty {
-  id             String   @id @default(cuid())
-  clientId       String
-  title          String
-  description    String
-  platform       String   // TWITTER, DISCORD, etc.
-  action         String   // LIKE, RETWEET, FOLLOW
-  targetUrl      String
-  targetAccount  String?
-  poolAmount     Float    // Total USDT locked in contract
-  rewardAmount   Float    // Reward per user
-  maxParticipants Int     @default(100)
-  participantsCount Int   @default(0)
-  status         String   @default("OPEN") // OPEN, COMPLETED, CANCELLED
-  contractAddress String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                String       @id @default(cuid())
+  clientId          String
+  title             String
+  description       String
+  platform          String // TWITTER, DISCORD, etc.
+  action            String // LIKE, RETWEET, FOLLOW
+  targetUrl         String
+  targetAccount     String?
+  poolAmount        Decimal      @db.Decimal(18, 6)
+  rewardAmount      Decimal      @db.Decimal(18, 6)
+  maxParticipants   Int          @default(100)
+  participantsCount Int          @default(0)
+  status            BountyStatus @default(OPEN)
+  contractAddress   String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
-  client         User          @relation(fields: [clientId], references: [id])
-  claims         BountyClaim[]
+  client User          @relation(fields: [clientId], references: [id])
+  claims BountyClaim[]
+
+  @@index([clientId])
+  @@index([status])
 }
 
 model BountyClaim {
-  id           String   @id @default(cuid())
-  bountyId     String
-  userId       String
-  status       String   @default("PENDING") // PENDING, VERIFIED, REJECTED
-  proofData    String?  // JSON: ZK proof or mocked receipt
-  txHash       String?  // Tx hash of the payout
-  autoClaimed  Boolean  @default(false) // Was this claimed by the Auto-Bounty Bot?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String            @id @default(cuid())
+  bountyId    String
+  userId      String
+  status      BountyClaimStatus @default(PENDING)
+  proofData   Json? // JSON: ZK proof or mocked receipt
+  txHash      String? // Tx hash of the payout
+  autoClaimed Boolean           @default(false) // Was this claimed by the Auto-Bounty Bot?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   bounty Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([bountyId, userId])
+  @@index([bountyId])
+  @@index([userId])
+  @@index([status])
 }

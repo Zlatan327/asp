@@ -8,19 +8,21 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db/prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
-    TwitterProvider({
-      clientId: process.env.TWITTER_CLIENT_ID!,
-      clientSecret: process.env.TWITTER_CLIENT_SECRET!,
-    }),
-    DiscordProvider({
-      clientId: process.env.DISCORD_CLIENT_ID!,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-    }),
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET ? [GithubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    })] : []),
+    ...(process.env.TWITTER_CLIENT_ID && process.env.TWITTER_CLIENT_SECRET ? [TwitterProvider({
+      clientId: process.env.TWITTER_CLIENT_ID,
+      clientSecret: process.env.TWITTER_CLIENT_SECRET,
+    })] : []),
+    ...(process.env.DISCORD_CLIENT_ID && process.env.DISCORD_CLIENT_SECRET ? [DiscordProvider({
+      clientId: process.env.DISCORD_CLIENT_ID,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET,
+    })] : []),
     CredentialsProvider({
       id: "siwe",
       name: "Wallet",
@@ -81,16 +83,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Ensure user exists in DB
       let dbUser = null;
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const p = profile as any;
+      const handle = String(p?.data?.username || p?.preferred_username || p?.login || user.name || "");
+      
       if (user.email) {
         dbUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
-      } else if (account) {
+      } else if (account && account.provider !== 'siwe' && account.provider !== 'credentials') {
         // Find by social account if no email
         const social = await prisma.socialAccount.findFirst({
           where: {
             platform: account.provider.toUpperCase(),
-            handle: String(profile?.preferred_username || profile?.login || user.name || ""),
+            handle: handle,
           }
         });
         if (social) {
@@ -111,7 +117,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       // Link social account
-      if (account) {
+      if (account && account.provider !== 'siwe' && account.provider !== 'credentials') {
         await prisma.socialAccount.upsert({
           where: {
             userId_platform: {
@@ -120,8 +126,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
           },
           update: {
-            handle: String(profile?.preferred_username || profile?.login || user.name || ""),
-            profileUrl: String(profile?.html_url || ""),
+            handle: handle,
+            profileUrl: String(p?.html_url || ""),
             accessToken: account.access_token,
             refreshToken: account.refresh_token,
             verified: true,
@@ -129,8 +135,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           create: {
             userId: dbUser.id,
             platform: account.provider.toUpperCase(),
-            handle: String(profile?.preferred_username || profile?.login || user.name || ""),
-            profileUrl: String(profile?.html_url || ""),
+            handle: handle,
+            profileUrl: String(p?.html_url || ""),
             accessToken: account.access_token,
             refreshToken: account.refresh_token,
             verified: true,
@@ -143,10 +149,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, account, profile }) {
       // If user object is present (first sign in), we need to ensure token.sub is our DB user ID
       if (user) {
-        if (account?.provider !== 'siwe') {
+        if (account?.provider !== 'siwe' && account?.provider !== 'credentials') {
           // For OAuth providers, the user.id is the provider's ID.
           // We need to fetch the actual DB user ID.
           let dbUser = null;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const p = profile as any;
+          const handle = String(p?.data?.username || p?.preferred_username || p?.login || user.name || "");
+          
           if (user.email) {
             dbUser = await prisma.user.findUnique({
               where: { email: user.email }
@@ -155,7 +165,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const social = await prisma.socialAccount.findFirst({
               where: {
                 platform: account.provider.toUpperCase(),
-                handle: String(profile?.preferred_username || profile?.login || user.name || ""),
+                handle: handle,
               }
             });
             if (social) {
@@ -201,3 +211,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: { strategy: "jwt" },
 });
+

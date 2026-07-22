@@ -34,6 +34,44 @@ const config: HardhatUserConfig = {
     cache: "./cache",
     artifacts: "./artifacts",
   },
+  networks: {
+    xlayerTestnet: {
+      type: "http",
+      url: process.env.XLAYER_TESTNET_RPC_URL || "https://testrpc.xlayer.tech",
+      accounts: [PRIVATE_KEY],
+      chainId: 1952,
+    },
+    xlayerMainnet: {
+      type: "http",
+      url: process.env.XLAYER_RPC_URL || "https://rpc.xlayer.tech",
+      accounts: [PRIVATE_KEY],
+      chainId: 196,
+    },
+  },
+  etherscan: {
+    apiKey: {
+      xlayerTestnet: "abc",
+      xlayerMainnet: "abc"
+    },
+    customChains: [
+      {
+        network: "xlayerTestnet",
+        chainId: 1952,
+        urls: {
+          apiURL: "https://www.okx.com/api/v5/explorer/xlayer/testnet/api",
+          browserURL: "https://www.okx.com/explorer/xlayer/testnet"
+        }
+      },
+      {
+        network: "xlayerMainnet",
+        chainId: 196,
+        urls: {
+          apiURL: "https://www.okx.com/api/v5/explorer/xlayer/api",
+          browserURL: "https://www.okx.com/explorer/xlayer"
+        }
+      }
+    ]
+  },
 };
 
 export default config;

@@ -119,9 +119,6 @@ export const POST = auth(async (req: any) => {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Onboarding API Error:', error);
-    try {
-      require('fs').writeFileSync('c:\\\\Users\\\\Admin\\\\.gemini\\\\antigravity\\\\brain\\\\0fd2468e-5b51-48f3-a8ee-b46848948ca6\\\\scratch\\\\error.log', String(error) + '\\n' + (error instanceof Error ? error.stack : ''));
-    } catch(e) {}
     return NextResponse.json(
       { error: 'Internal Server Error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

@@ -2,10 +2,10 @@
   "network": "xlayerTestnet",
   "chainId": 1952,
   "deployer": "0xD29CC27f6D1545158a935EC97001ab3967FA4ee1",
-  "escrowFactory": "0xc53Eec42608636aca743afDECe5889199e645787",
-  "reputationSBT": "0xC329594Be562Db47e6065336dB3a23cC9867c318",
-  "usdtAddress": "0xEF3504749da16afba32F34fF457E4AE400512B8B",
-  "deployedAt": "2026-07-15T14:14:44.067Z",
-  "blockNumber": 35666047,
-  "bountyPool": "0x3EDD491749c240c740959685A2B667Df182F94ea"
+  "escrowFactory": "0x07e6F24a981B7dfd92e82BAE0d5D5637fe798DE9",
+  "reputationSBT": "0x9181cDb2341366E0cff16ecf42704286B9DB392A",
+  "usdtAddress": "0xfFA28F2d180f0069bEce5598762fff023CEdcFd2",
+  "deployedAt": "2026-07-22T04:28:10.324Z",
+  "blockNumber": 36235653,
+  "bountyPool": "0xb3857aEd0bA0BC64d9332Bf71Cce1EA7A88fd8f6"
 }

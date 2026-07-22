@@ -30,7 +30,7 @@ interface DeploymentAddresses {
 // Ensure you run `npx hardhat compile` first!
 const ESCROW_FACTORY_ARTIFACT_PATH = path.join(process.cwd(), "artifacts/contracts/Escrow.sol/EscrowFactory.json");
 const REPUTATION_SBT_ARTIFACT_PATH = path.join(process.cwd(), "artifacts/contracts/ReputationSBT.sol/ReputationSBT.json");
-const TEST_USDT_ARTIFACT_PATH = path.join(process.cwd(), "artifacts/contracts/mock/TestUSDT.sol/TestUSDT.json");
+const TEST_USDT_ARTIFACT_PATH = path.join(process.cwd(), "artifacts/contracts/mocks/TestUSDT.sol/TestUSDT.json");
 
 async function main() {
   const rpcUrl = process.env.XLAYER_TESTNET_RPC || "https://testrpc.xlayer.tech/terigon";
@@ -78,7 +78,7 @@ async function main() {
   // ── 1. Deploy EscrowFactory ──────────────────────────
   console.log("Deploying EscrowFactory...");
   const EscrowFactory = new ethers.ContractFactory(escrowArtifact.abi, escrowArtifact.bytecode, deployer);
-  const escrowFactory = await EscrowFactory.deploy(deployer.address);
+  const escrowFactory = await EscrowFactory.deploy(deployer.address, deployer.address);
   await escrowFactory.waitForDeployment();
   const escrowFactoryAddress = await escrowFactory.getAddress();
   console.log(`  ✅ EscrowFactory deployed at: ${escrowFactoryAddress}`);

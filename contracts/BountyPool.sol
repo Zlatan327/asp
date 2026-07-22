@@ -18,6 +18,9 @@ contract BountyPool is ReentrancyGuard, Pausable, Ownable {
 
     IERC20 public immutable paymentToken;
     address public backendVerifier;
+    
+    uint256 public platformFeeBps = 200; // Default 2%
+    address public feeRecipient;
 
     struct Pool {
         address creator;
@@ -27,21 +30,24 @@ contract BountyPool is ReentrancyGuard, Pausable, Ownable {
         bool isActive;
     }
 
-    // Mapping from bountyId (string) to Pool
-    mapping(string => Pool) public pools;
+    // Mapping from bountyId (bytes32) to Pool
+    mapping(bytes32 => Pool) public pools;
     // Mapping from bountyId -> (userAddress => bool) to prevent double claims
-    mapping(string => mapping(address => bool)) public hasClaimed;
+    mapping(bytes32 => mapping(address => bool)) public hasClaimed;
 
-    event PoolCreated(string bountyId, address indexed creator, uint256 totalAmount, uint256 rewardPerClaim);
-    event BountyClaimed(string bountyId, address indexed user, uint256 amount);
-    event PoolCancelled(string bountyId, address indexed creator, uint256 refundAmount);
-    event VerifierUpdated(address newVerifier);
+    event PoolCreated(bytes32 indexed bountyId, address indexed creator, uint256 totalAmount, uint256 rewardPerClaim);
+    event BountyClaimed(bytes32 indexed bountyId, address indexed user, uint256 amount);
+    event PoolCancelled(bytes32 indexed bountyId, address indexed creator, uint256 refundAmount);
+    event VerifierUpdated(address indexed newVerifier);
+    event FeeConfigUpdated(uint256 platformFeeBps, address indexed feeRecipient);
 
-    constructor(address _paymentToken, address _backendVerifier) Ownable(msg.sender) {
+    constructor(address _paymentToken, address _backendVerifier, address _feeRecipient) Ownable(msg.sender) {
         require(_paymentToken != address(0), "Invalid token");
         require(_backendVerifier != address(0), "Invalid verifier");
+        require(_feeRecipient != address(0), "Invalid fee recipient");
         paymentToken = IERC20(_paymentToken);
         backendVerifier = _backendVerifier;
+        feeRecipient = _feeRecipient;
     }
 
     function setBackendVerifier(address _newVerifier) external onlyOwner {
@@ -49,8 +55,16 @@ contract BountyPool is ReentrancyGuard, Pausable, Ownable {
         backendVerifier = _newVerifier;
         emit VerifierUpdated(_newVerifier);
     }
+    
+    function setFeeConfig(uint256 _platformFeeBps, address _feeRecipient) external onlyOwner {
+        require(_platformFeeBps <= 10000, "Fee too high");
+        require(_feeRecipient != address(0), "Invalid fee recipient");
+        platformFeeBps = _platformFeeBps;
+        feeRecipient = _feeRecipient;
+        emit FeeConfigUpdated(_platformFeeBps, _feeRecipient);
+    }
 
-    function createPool(string calldata bountyId, uint256 totalAmount, uint256 rewardPerClaim) external whenNotPaused {
+    function createPool(bytes32 bountyId, uint256 totalAmount, uint256 rewardPerClaim) external whenNotPaused {
         require(totalAmount > 0, "Amount must be > 0");
         require(rewardPerClaim > 0 && rewardPerClaim <= totalAmount, "Invalid reward amount");
         require(pools[bountyId].totalAmount == 0, "Pool already exists");
@@ -70,7 +84,7 @@ contract BountyPool is ReentrancyGuard, Pausable, Ownable {
 
     // For the hackathon demo, the backend can directly call this when the ZK proof is validated.
     // In production, we would use EIP-712 signatures.
-    function distributeReward(string calldata bountyId, address user) external {
+    function distributeReward(bytes32 bountyId, address user) external {
         require(msg.sender == backendVerifier || msg.sender == owner(), "Only verifier can distribute");
         Pool storage pool = pools[bountyId];
         require(pool.isActive, "Pool is not active");
@@ -80,11 +94,18 @@ contract BountyPool is ReentrancyGuard, Pausable, Ownable {
         hasClaimed[bountyId][user] = true;
         pool.claimsPaid++;
 
-        paymentToken.safeTransfer(user, pool.rewardPerClaim);
-        emit BountyClaimed(bountyId, user, pool.rewardPerClaim);
+        uint256 fee = (pool.rewardPerClaim * platformFeeBps) / 10000;
+        uint256 userAmount = pool.rewardPerClaim - fee;
+
+        if (fee > 0) {
+            paymentToken.safeTransfer(feeRecipient, fee);
+        }
+        paymentToken.safeTransfer(user, userAmount);
+        
+        emit BountyClaimed(bountyId, user, userAmount);
     }
 
-    function cancelPool(string calldata bountyId) external nonReentrant {
+    function cancelPool(bytes32 bountyId) external nonReentrant {
         Pool storage pool = pools[bountyId];
         require(msg.sender == pool.creator || msg.sender == owner(), "Not authorized");
         require(pool.isActive, "Pool not active");
