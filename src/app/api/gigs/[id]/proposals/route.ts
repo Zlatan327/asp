@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/auth';
 import { proposalAgent } from '@/lib/ai';
+import { safeParseJson } from '@/lib/json';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -38,15 +39,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
       const parsedProfile = {
         ...freelancer.freelancerProfile,
-        skills: JSON.parse(freelancer.freelancerProfile.skills || '[]'),
-        experiences: JSON.parse(freelancer.freelancerProfile.experiences || '[]'),
-        education: JSON.parse(freelancer.freelancerProfile.education || '[]'),
-        badges: JSON.parse(freelancer.freelancerProfile.badges || '[]'),
+        skills: safeParseJson(freelancer.freelancerProfile.skills),
+        experiences: safeParseJson(freelancer.freelancerProfile.experiences),
+        education: safeParseJson(freelancer.freelancerProfile.education),
+        badges: safeParseJson(freelancer.freelancerProfile.badges),
       } as any;
 
       const parsedGig = {
         ...gig,
-        skills: JSON.parse(gig.skills || '[]'),
+        skills: safeParseJson(gig.skills),
       } as any;
 
       const draftResult = await proposalAgent.draftProposal(parsedProfile, parsedGig);

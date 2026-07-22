@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/auth';
 import { reputationAgent } from '@/lib/ai/agents/reputation';
+import { safeParseJson } from '@/lib/json';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -53,7 +54,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
 
     const currentRep = await prisma.reputation.findUnique({ where: { userId: gig.freelancerId } });
-    const history = currentRep && currentRep.history ? JSON.parse(currentRep.history as string) : [];
+    const history = currentRep && currentRep.history ? safeParseJson(currentRep.history, []) : [];
     history.push(metadata);
 
     // Save score to DB

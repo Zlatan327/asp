@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { safeParseJson } from '@/lib/json';
 
 interface Gig {
   id: string;
@@ -150,7 +151,7 @@ export default function MarketplacePage() {
                         {gig.description}
                       </p>
                       <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-                        {JSON.parse(gig.skills || '[]').map((skill: string) => (
+                        {safeParseJson(gig.skills, []).map((skill: string) => (
                           <span key={skill} style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)' }}>#{skill}</span>
                         ))}
                       </div>

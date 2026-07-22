@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db/prisma';
+import { safeParseJson } from '@/lib/json';
 
 export default async function FreelancerProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -21,7 +22,7 @@ export default async function FreelancerProfilePage({ params }: { params: Promis
 
   const profile = freelancer.freelancerProfile;
   const reputation = freelancer.reputationScore;
-  const skills = JSON.parse(profile.skills || '[]');
+  const skills = safeParseJson(profile.skills, []);
 
   return (
     <div style={{ minHeight: '100vh', padding: 'var(--space-8)' }}>

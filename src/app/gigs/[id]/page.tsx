@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import EscrowPanel from '@/components/EscrowPanel';
+import { safeParseJson } from '@/lib/json';
 
 export default function GigDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
@@ -101,7 +102,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
             
             <div style={{ display: 'flex', gap: 'var(--space-4)', marginBottom: 'var(--space-6)', flexWrap: 'wrap' }}>
               <span className="badge badge-info">{gig.experienceLevel} Experience</span>
-              {JSON.parse(gig.skills || '[]').map((s: string) => (
+              {safeParseJson(gig.skills, []).map((s: string) => (
                  <span key={s} className="skill-tag">{s}</span>
               ))}
             </div>

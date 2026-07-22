@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/auth';
 import { taskManagerAgent } from '@/lib/ai/agents/task-manager';
+import { safeParseJson } from '@/lib/json';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     // Prepare Gig object for TaskManagerAgent (parse milestones)
     const gigData: any = {
       ...gig,
-      milestones: JSON.parse(gig.milestones || '[]')
+      milestones: safeParseJson(gig.milestones)
     };
 
     const generatedTasks = await taskManagerAgent.generateTasks(gigData);
