@@ -30,11 +30,11 @@ KLOP is built to deliver a "wow" factor:
 ## 4. Key Features & Operation
 
 ### 4.1 The Scout Agent
-The core AI of KLOP. When a user uploads their CV, the Scout Agent:
-1. Reads the document stream.
-2. Formats a structured prompt to the underlying language model.
+The core AI of KLOP. When a user connects their social accounts (GitHub/X) and/or uploads a CV, the Scout Agent:
+1. Reads the document stream and extracts raw profile metrics (repositories, tweets, bio) from the linked social APIs.
+2. Formats a structured prompt to the underlying language model to cross-reference claims (e.g., verifying React skills from GitHub repo languages).
 3. Receives JSON-structured competency data (e.g., {"skills": ["React", "Node"], "reputation": 85}).
-4. Directly injects this parsed profile into the user's secure database record.
+4. Directly injects this parsed and verified profile into the user's secure database record.
 
 ### 4.2 Marketplace & Gig Workflow
 1. A client posts a gig or "bounty".
