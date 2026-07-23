@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 import Link from 'next/link';
 import { safeParseJson } from '@/lib/json';
+import DashboardTrackers from '@/components/DashboardTrackers';
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -19,7 +20,11 @@ export default async function DashboardPage() {
       clientProfile: true,
       reputationScore: true,
       gigsWorked: true,
-      gigsPosted: true,
+      gigsPosted: {
+        include: {
+          proposals: true
+        }
+      },
     },
   });
 
@@ -139,33 +144,13 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Active Gigs Section */}
-        <div className="card" style={{ gridColumn: '1 / -1', padding: 'var(--space-6)', marginTop: 'var(--space-4)' }}>
-          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 'var(--space-6)' }}>Active Gigs</h2>
-          
-          {user.gigsWorked.length === 0 && user.gigsPosted.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 'var(--space-8) 0', color: 'var(--color-text-tertiary)' }}>
-              <p>No active gigs found.</p>
-              <Link href="/marketplace" style={{ color: 'var(--color-accent-primary)', marginTop: 'var(--space-2)', display: 'inline-block' }}>Explore Marketplace →</Link>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-              {[...user.gigsWorked, ...user.gigsPosted]
-                .filter(g => g.status === 'IN_PROGRESS' || g.status === 'OPEN')
-                .map(gig => (
-                  <Link href={`/gigs/${gig.id}`} key={gig.id} style={{ display: 'block', padding: 'var(--space-4)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)', background: 'var(--color-background-elevated)', textDecoration: 'none', color: 'inherit' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 600 }}>{gig.title}</h3>
-                      <span className={`badge ${gig.status === 'OPEN' ? 'badge-info' : 'badge-warning'}`}>{gig.status}</span>
-                    </div>
-                    <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
-                      Budget: {gig.budget.toString()} USDT
-                    </div>
-                  </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Dynamic Gig Trackers */}
+        <DashboardTrackers 
+          gigsPosted={user.gigsPosted} 
+          gigsWorked={user.gigsWorked} 
+          isClient={isClient} 
+          isFreelancer={isFreelancer} 
+        />
 
       </div>
     </div>
