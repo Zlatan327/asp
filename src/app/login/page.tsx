@@ -38,7 +38,7 @@ export default function LoginPage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <button
-            onClick={() => signIn('github', { callbackUrl: '/onboarding' })}
+            onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
             className="btn btn-secondary w-full"
             style={{ justifyContent: 'center' }}
           >
@@ -47,7 +47,7 @@ export default function LoginPage() {
           </button>
           
           <button
-            onClick={() => signIn('twitter', { callbackUrl: '/onboarding' })}
+            onClick={() => signIn('twitter', { callbackUrl: '/dashboard' })}
             className="btn btn-secondary w-full"
             style={{ justifyContent: 'center' }}
           >
@@ -56,7 +56,7 @@ export default function LoginPage() {
           </button>
 
           <button
-            onClick={() => signIn('discord', { callbackUrl: '/onboarding' })}
+            onClick={() => signIn('discord', { callbackUrl: '/dashboard' })}
             className="btn btn-secondary w-full"
             style={{ justifyContent: 'center' }}
           >

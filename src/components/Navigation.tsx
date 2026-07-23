@@ -36,9 +36,6 @@ export default function Navigation({ session }: { session: any }) {
           </>
         ) : (
           <>
-            <Link href="/okxai" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              OKX.AI
-            </Link>
             <Link href="/#how-it-works" className="btn btn-secondary" style={{ fontSize: 'var(--text-xs)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-full)' }}>
               Quick Guide
             </Link>
@@ -77,9 +74,6 @@ export default function Navigation({ session }: { session: any }) {
             </>
           ) : (
             <>
-              <Link href="/okxai" onClick={closeMenu} style={{ padding: 'var(--space-2) 0', fontSize: 'var(--text-base)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-                OKX.AI
-              </Link>
               <Link href="/#how-it-works" onClick={closeMenu} className="btn btn-secondary" style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', textAlign: 'center', marginTop: 'var(--space-2)' }}>
                 Quick Guide
               </Link>
