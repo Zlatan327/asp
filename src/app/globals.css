@@ -950,6 +950,15 @@ input::placeholder, textarea::placeholder {
   .card, .glass-card {
     padding: var(--space-4) !important;
   }
+
+  .btn {
+    width: 100%;
+  }
+
+  .btn-lg {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+  }
 }
 
 /* Mobile Nav Utilities */
