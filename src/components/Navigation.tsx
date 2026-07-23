@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, Menu, X } from 'lucide-react';
 import ConnectWalletButton from './ConnectWalletButton';
+import { signOut } from 'next-auth/react';
 
 export default function Navigation({ session }: { session: any }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +33,12 @@ export default function Navigation({ session }: { session: any }) {
             <Link href="/dashboard" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
               Dashboard
             </Link>
+            <Link href="/profile" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+              Profile
+            </Link>
+            <button onClick={() => signOut({ callbackUrl: '/' })} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-tertiary)', transition: 'color 0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = 'var(--color-error)'} onMouseOut={(e) => e.currentTarget.style.color = 'var(--color-text-tertiary)'}>
+              Log Out
+            </button>
             <ConnectWalletButton />
           </>
         ) : (
@@ -68,6 +75,12 @@ export default function Navigation({ session }: { session: any }) {
               <Link href="/dashboard" onClick={closeMenu} style={{ padding: 'var(--space-2) 0', fontSize: 'var(--text-base)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
                 Dashboard
               </Link>
+              <Link href="/profile" onClick={closeMenu} style={{ padding: 'var(--space-2) 0', fontSize: 'var(--text-base)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+                Profile
+              </Link>
+              <button onClick={() => signOut({ callbackUrl: '/' })} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 'var(--space-2) 0', fontSize: 'var(--text-base)', fontWeight: 500, color: 'var(--color-text-tertiary)', textAlign: 'left', width: '100%' }}>
+                Log Out
+              </button>
               <div style={{ paddingTop: 'var(--space-2)' }}>
                 <ConnectWalletButton />
               </div>
