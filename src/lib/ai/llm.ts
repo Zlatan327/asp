@@ -33,7 +33,7 @@ function getConfig() {
     return {
       apiKey,
       baseUrl: process.env.GOOGLE_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai',
-      model: process.env.GOOGLE_MODEL || 'gemini-1.5-pro',
+      model: (process.env.GOOGLE_MODEL && process.env.GOOGLE_MODEL !== 'gemini-1.5-pro') ? process.env.GOOGLE_MODEL : 'gemini-1.5-pro-latest',
     };
   }
 

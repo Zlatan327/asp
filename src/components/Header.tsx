@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import ConnectWalletButton from './ConnectWalletButton';
 import { auth } from '@/auth';
-import { Sparkles } from 'lucide-react';
+import Navigation from './Navigation';
 
 export default async function Header() {
   const session = await auth();
@@ -25,37 +24,7 @@ export default async function Header() {
         KLOP<span style={{ color: 'var(--color-accent-primary)' }}>.</span>
       </Link>
       
-      <div className="site-nav" style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-6)' }}>
-        {session ? (
-          <>
-            <Link href="/okxai" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              OKX.AI
-            </Link>
-            <Link href="/marketplace" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              Marketplace
-            </Link>
-            <Link href="/bounties" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              Bounty Hub
-            </Link>
-            <Link href="/agent-dashboard" style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-accent-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              <Sparkles size={14} /> Agents
-            </Link>
-            <Link href="/dashboard" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              Dashboard
-            </Link>
-            <ConnectWalletButton />
-          </>
-        ) : (
-          <>
-            <Link href="/okxai" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-              OKX.AI
-            </Link>
-            <Link href="/#how-it-works" className="btn btn-secondary" style={{ fontSize: 'var(--text-xs)', padding: 'var(--space-2) var(--space-4)', borderRadius: 'var(--radius-full)' }}>
-              Quick Guide
-            </Link>
-          </>
-        )}
-      </div>
+      <Navigation session={session} />
     </header>
   );
 }
