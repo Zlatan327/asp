@@ -1,9 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signIn } from 'next-auth/react';
-import { Bot, UploadCloud, Building2, UserCircle2, Loader2, Link as LinkIcon } from 'lucide-react';
+import { Bot, UploadCloud, Building2, UserCircle2, Loader2, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
+
+type ConnectedSocial = {
+  platform: string;
+  handle: string;
+  profileUrl: string | null;
+  verified: boolean;
+};
+
+const socialProviders = [
+  { id: 'github', platform: 'GITHUB', label: 'GitHub' },
+  { id: 'twitter', platform: 'TWITTER', label: 'X (Twitter)' },
+] as const;
 
 export default function OnboardingFlow() {
   const { data: session } = useSession();
@@ -15,6 +27,34 @@ export default function OnboardingFlow() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState('');
   const [agentMessage, setAgentMessage] = useState('Initializing Scout Agent...');
+  const [connectedSocials, setConnectedSocials] = useState<ConnectedSocial[]>([]);
+  const [socialsLoading, setSocialsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    let mounted = true;
+    setSocialsLoading(true);
+    fetch('/api/profile/socials')
+      .then((res) => (res.ok ? res.json() : { socials: [] }))
+      .then((data) => {
+        if (mounted) setConnectedSocials(Array.isArray(data.socials) ? data.socials : []);
+      })
+      .catch((error) => {
+        console.error('Failed to load connected socials:', error);
+      })
+      .finally(() => {
+        if (mounted) setSocialsLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [session?.user?.id]);
+
+  const connectedByPlatform = useMemo(() => {
+    return new Map(connectedSocials.map((social) => [social.platform.toUpperCase(), social]));
+  }, [connectedSocials]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -133,11 +173,11 @@ export default function OnboardingFlow() {
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>Upload CV (PDF)</label>
+                    <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>Upload CV (PDF/Word)</label>
                     <div className="card" style={{ padding: 'var(--space-4)', borderStyle: 'dashed', textAlign: 'center' }}>
                       <input
                         type="file"
-                      accept=".pdf,.doc,.docx"
+                        accept=".pdf,.doc,.docx"
                         id="cv-upload"
                         onChange={(e) => setCvFile(e.target.files?.[0] || null)}
                         style={{ display: 'none' }}
@@ -154,12 +194,41 @@ export default function OnboardingFlow() {
                   <div>
                     <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>Social Connections</label>
                     <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                      <button type="button" className="btn btn-secondary" style={{ flex: 1, display: 'flex', gap: 'var(--space-2)' }} onClick={() => signIn('github', { callbackUrl: '/onboarding' })}>
-                        <LinkIcon size={18} /> GitHub
-                      </button>
-                      <button type="button" className="btn btn-secondary" style={{ flex: 1, display: 'flex', gap: 'var(--space-2)' }} onClick={() => signIn('twitter', { callbackUrl: '/onboarding' })}>
-                        <LinkIcon size={18} /> X (Twitter)
-                      </button>
+                      {socialProviders.map((provider) => {
+                        const connected = connectedByPlatform.get(provider.platform);
+                        const isConnected = Boolean(connected);
+                        return (
+                          <button
+                            key={provider.id}
+                            type="button"
+                            className="btn btn-secondary"
+                            disabled={isConnected || socialsLoading}
+                            style={{
+                              flex: 1,
+                              display: 'flex',
+                              gap: 'var(--space-2)',
+                              justifyContent: 'center',
+                              opacity: isConnected ? 0.55 : 1,
+                              cursor: isConnected ? 'not-allowed' : 'pointer',
+                              background: isConnected ? 'rgba(255,255,255,0.05)' : undefined,
+                              borderColor: isConnected ? 'var(--color-border-subtle)' : undefined,
+                            }}
+                            onClick={() => {
+                              if (!isConnected) signIn(provider.id, { callbackUrl: '/onboarding' });
+                            }}
+                          >
+                            {isConnected ? <CheckCircle2 size={18} /> : <LinkIcon size={18} />}
+                            <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, alignItems: 'center' }}>
+                              <span>{isConnected ? 'Connected' : provider.label}</span>
+                              {isConnected && (
+                                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
+                                  @{connected?.handle || provider.label}
+                                </span>
+                              )}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
