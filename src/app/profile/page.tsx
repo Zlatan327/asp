@@ -2,6 +2,13 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 import ProfileSettingsClient from './ProfileSettingsClient';
+import { type EnabledSocialProvider } from '@/components/LoginClient';
+
+const socialLoginEnabled = process.env.ENABLE_SOCIAL_LOGIN === 'true';
+
+function hasCredentials(idName: string, secretName: string) {
+  return Boolean(process.env[idName] && process.env[secretName]);
+}
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -23,6 +30,14 @@ export default async function ProfilePage() {
     redirect('/login');
   }
 
+  const enabledSocialProviders: EnabledSocialProvider[] = [];
+  if (socialLoginEnabled && hasCredentials('GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET')) {
+    enabledSocialProviders.push('github');
+  }
+  if (socialLoginEnabled && hasCredentials('TWITTER_CLIENT_ID', 'TWITTER_CLIENT_SECRET')) {
+    enabledSocialProviders.push('twitter');
+  }
+
   return (
     <div style={{ minHeight: '100vh', padding: 'var(--space-8)' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
@@ -38,6 +53,7 @@ export default async function ProfilePage() {
             socialAccounts={user.socialAccounts} 
             walletAddress={user.walletAddress}
             currentScore={user.reputationScore?.overallScore}
+            enabledSocialProviders={enabledSocialProviders}
           />
         </div>
 

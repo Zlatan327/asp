@@ -3,15 +3,57 @@
 import { useState } from "react";
 import { Bot, CheckCircle, Zap, Shield, Loader2, Coins } from "lucide-react";
 import ZkVerificationModal from "@/components/ZkVerificationModal";
+import { ethers } from "ethers";
+import { getProvider, USDT_ADDRESS } from "@/lib/blockchain/contracts";
+import { TEST_USDT_ABI } from "@/lib/blockchain/config";
 
-export default function BountyClient({ initialBounties, userId, botUnlocked, srs, tasksCompleted, hasTwitter, hasDiscord }: any) {
+export default function BountyClient({ initialBounties, userId, botUnlocked, rentedBot: initialRentedBot, srs, tasksCompleted, hasTwitter, hasDiscord }: any) {
   const [bounties, setBounties] = useState(initialBounties);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [targetUrl, setTargetUrl] = useState("");
   const [autoBotActive, setAutoBotActive] = useState(false);
   const [claiming, setClaiming] = useState<string | null>(null);
-  const [rentedBot, setRentedBot] = useState(false);
+  const [rentedBot, setRentedBot] = useState(Boolean(initialRentedBot));
   const [renting, setRenting] = useState(false);
+
+  const persistRental = async (txHash: string, mode: "paid" | "demo") => {
+    const res = await fetch("/api/autobot/rent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ txHash, mode })
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.error || "Failed to activate Auto-Bot rental");
+    }
+  };
+
+  const payForAutoBot = async () => {
+    const treasuryAddress = process.env.NEXT_PUBLIC_AUTOBOT_TREASURY_ADDRESS;
+    const demoRentalEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_AUTOBOT_RENTAL === "true";
+
+    if (!treasuryAddress) {
+      if (!demoRentalEnabled) {
+        throw new Error("Auto-Bot treasury address is not configured.");
+      }
+      await persistRental(`demo-${Date.now()}`, "demo");
+      return;
+    }
+
+    if (!ethers.isAddress(treasuryAddress)) {
+      throw new Error("Configured Auto-Bot treasury address is invalid.");
+    }
+
+    const provider = await getProvider();
+    const signer = await provider.getSigner();
+    const token = new ethers.Contract(USDT_ADDRESS, TEST_USDT_ABI, signer);
+    const decimals = Number(process.env.NEXT_PUBLIC_AUTOBOT_PAYMENT_DECIMALS || 18);
+    const amount = ethers.parseUnits("50", decimals);
+    const tx = await token.transfer(treasuryAddress, amount);
+    const receipt = await tx.wait();
+    await persistRental(receipt?.hash || tx.hash, "paid");
+  };
 
   const handleVerifyClick = (bounty: any) => {
     if (bounty.platform === 'TWITTER' && !hasTwitter) {
@@ -59,12 +101,18 @@ export default function BountyClient({ initialBounties, userId, botUnlocked, srs
     if (!botUnlocked && !rentedBot) {
       if (confirm("You need 10+ completed tasks and 90+ SRS to organically unlock the Auto-Bot.\\n\\nWould you like to RENT the Auto-Bot for 50 USDT instead?")) {
         setRenting(true);
-        setTimeout(() => {
+        payForAutoBot()
+          .then(() => {
           setRenting(false);
           setRentedBot(true);
           setAutoBotActive(true);
           alert("Payment successful! Auto-Bot rented and activated.");
-        }, 2000);
+          })
+          .catch((error) => {
+            console.error(error);
+            alert(error instanceof Error ? error.message : "Auto-Bot rental failed");
+          })
+          .finally(() => setRenting(false));
       }
       return;
     }

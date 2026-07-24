@@ -2,12 +2,18 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
+import { type EnabledSocialProvider } from '@/components/LoginClient';
 
-export default function ProfileSettingsClient({ socialAccounts, walletAddress, currentScore }: any) {
+export default function ProfileSettingsClient({ socialAccounts, walletAddress, currentScore, enabledSocialProviders }: any) {
   const [isEvaluating, setIsEvaluating] = useState(false);
   
-  const platforms = ['github', 'twitter'];
-  const connectedPlatforms = socialAccounts.map((s: any) => s.platform);
+  const connectedPlatforms = socialAccounts.map((s: any) => String(s.platform).toUpperCase());
+  const platforms = Array.from(
+    new Set([
+      ...(enabledSocialProviders || []),
+      ...connectedPlatforms.map((platform: string) => platform.toLowerCase()),
+    ]),
+  ).filter((platform) => platform === 'github' || platform === 'twitter') as EnabledSocialProvider[];
 
   const handleReevaluate = async () => {
     setIsEvaluating(true);
@@ -41,7 +47,7 @@ export default function ProfileSettingsClient({ socialAccounts, walletAddress, c
 
         {/* Social connections */}
         {platforms.map(platform => {
-          const isConnected = connectedPlatforms.includes(platform);
+          const isConnected = connectedPlatforms.includes(platform.toUpperCase());
           return (
             <div key={platform} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-3)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>

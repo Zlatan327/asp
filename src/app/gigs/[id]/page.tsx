@@ -19,7 +19,7 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
   const [coverLetter, setCoverLetter] = useState('');
   const [bidAmount, setBidAmount] = useState('');
   const [estimatedDays, setEstimatedDays] = useState('');
-  const [useAiDraft, setUseAiDraft] = useState(false);
+  const [useAiDraft, setUseAiDraft] = useState(true);
 
   useEffect(() => {
     fetch(`/api/gigs/${unwrappedParams.id}`)
@@ -126,6 +126,33 @@ export default function GigDetailPage({ params }: { params: Promise<{ id: string
                         <div style={{ fontWeight: 600 }}>{p.freelancer?.name}</div>
                         <div style={{ fontWeight: 700, color: 'var(--color-accent-primary)' }}>{p.bidAmount} USDT in {p.estimatedDays} days</div>
                       </div>
+                      {p.freelancer?.freelancerProfile && (
+                        <div style={{ marginBottom: 'var(--space-3)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--color-border-subtle)' }}>
+                          <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', flexWrap: 'wrap', marginBottom: 'var(--space-2)' }}>
+                            <span className="badge badge-success">
+                              Credibility: {Number(p.freelancer.freelancerProfile.credibilityScore || 0).toFixed(0)}/100
+                            </span>
+                            {p.freelancer?.reputationScore?.socialScore != null && (
+                              <span className="badge badge-info">
+                                Social proof: {Number(p.freelancer.reputationScore.socialScore || 0).toFixed(0)}/100
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                            {safeParseJson<any[]>(p.freelancer.freelancerProfile.skills, []).slice(0, 6).map((skill: any) => (
+                              <span key={skill.name || skill} className="skill-tag">
+                                {skill.name || skill}
+                                {skill.confidence != null && <span style={{ opacity: 0.55, marginLeft: 4 }}>{Number(skill.confidence).toFixed(0)}%</span>}
+                              </span>
+                            ))}
+                          </div>
+                          {safeParseJson<any>(p.freelancer.freelancerProfile.scoutReport, null)?.narrative && (
+                            <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                              {safeParseJson<any>(p.freelancer.freelancerProfile.scoutReport, null).narrative}
+                            </p>
+                          )}
+                        </div>
+                      )}
                       {p.matchScore && (
                         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-success)', marginBottom: 'var(--space-2)' }}>
                           ✨ AI Match Score: {(p.matchScore * 100).toFixed(0)}%

@@ -8,6 +8,19 @@ import { SiweMessage } from "siwe";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db/prisma";
 
+function profileUrlForProvider(provider: string, profile: any) {
+  if (provider === 'github') return String(profile?.html_url || '');
+  if (provider === 'twitter') {
+    const username = profile?.data?.username || profile?.username || profile?.screen_name;
+    return username ? `https://x.com/${username}` : '';
+  }
+  if (provider === 'discord') {
+    const id = profile?.id;
+    return id ? `https://discord.com/users/${id}` : '';
+  }
+  return '';
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
@@ -129,7 +142,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
           update: {
             handle: handle,
-            profileUrl: String(p?.html_url || ""),
+            profileUrl: profileUrlForProvider(account.provider, p),
             accessToken: account.access_token,
             refreshToken: account.refresh_token,
             verified: true,
@@ -138,7 +151,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             userId: dbUser.id,
             platform: account.provider.toUpperCase(),
             handle: handle,
-            profileUrl: String(p?.html_url || ""),
+            profileUrl: profileUrlForProvider(account.provider, p),
             accessToken: account.access_token,
             refreshToken: account.refresh_token,
             verified: true,

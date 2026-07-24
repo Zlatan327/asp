@@ -59,8 +59,8 @@ export async function POST(req: Request) {
         currency: 'USDT',
         experienceLevel: data.experienceLevel || 'ANY',
         estimatedDuration: data.estimatedDuration,
-        milestones: JSON.stringify(data.milestones || []),
-        skills: JSON.stringify(data.skills || []),
+        milestones: (data.milestones || []) as any,
+        skills: (data.skills || []) as any,
       },
     });
 

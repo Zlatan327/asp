@@ -70,6 +70,66 @@ export async function chatCompletion(
       };
       return { content: JSON.stringify(mockJson), model: 'mock-mimo' };
     }
+
+    if (systemPrompt.includes('ASP Scout Agent')) {
+      const mockJson = {
+        skills: [
+          { name: 'React', category: 'Frontend', confidence: 92, sources: ['cv', 'github'] },
+          { name: 'Next.js', category: 'Frontend', confidence: 90, sources: ['cv', 'github'] },
+          { name: 'TypeScript', category: 'Programming', confidence: 88, sources: ['github'] },
+          { name: 'Smart Contract Integration', category: 'Blockchain', confidence: 78, sources: ['cv', 'github'] }
+        ],
+        experiences: [
+          {
+            company: 'Independent Projects',
+            role: 'Full-stack Web3 Developer',
+            duration: 'Verified from public footprint',
+            highlights: ['Built frontend applications', 'Integrated wallet and escrow flows', 'Shipped Web3 user experiences'],
+            verified: true,
+            source: 'github'
+          }
+        ],
+        education: [],
+        badges: [
+          {
+            id: 'verified-footprint',
+            name: 'Verified Footprint',
+            icon: 'shield',
+            description: 'Profile generated from connected accounts and uploaded CV evidence.',
+            earnedAt: new Date().toISOString(),
+            category: 'verification'
+          }
+        ],
+        credibilityScore: 86,
+        narrative: 'This freelancer shows a strong frontend and Web3 implementation footprint, with consistent evidence across CV and connected social accounts.',
+        strengths: ['Frontend Architecture', 'Wallet UX', 'Web3 Product Shipping'],
+        sources: {
+          cv: { parsed: true, sections: ['skills', 'experience', 'projects'] },
+          github: { repos: 12, stars: 18, contributions: 0, languages: { TypeScript: 70, JavaScript: 20, Solidity: 10 } },
+          twitter: { tweets: 12, techSignals: ['React', 'Web3', 'AI'], engagementScore: 42 }
+        },
+        generatedAt: new Date().toISOString()
+      };
+      return { content: JSON.stringify(mockJson), model: 'mock-mimo' };
+    }
+
+    if (systemPrompt.includes('KLOP PM Agent')) {
+      const mockJson = {
+        title: 'Build an X Layer escrow dashboard',
+        description: 'Create a production-ready dashboard where clients can fund milestone escrow, freelancers can submit deliverables, and both parties can track payment status on X Layer. Deliverables include responsive UI, wallet connection, contract reads/writes, and deployment-ready documentation.',
+        budget: 500,
+        budgetType: 'FIXED',
+        experienceLevel: 'INTERMEDIATE',
+        skills: ['Next.js', 'TypeScript', 'Ethers.js', 'X Layer', 'Smart Contracts'],
+        estimatedDuration: '10 days',
+        milestones: [
+          { title: 'UX and data model', description: 'Define screens, states, and milestone data structure.', amount: 100 },
+          { title: 'Wallet and escrow integration', description: 'Implement contract reads/writes and funding status.', amount: 250 },
+          { title: 'QA and deployment', description: 'Test flows and prepare production deployment.', amount: 150 }
+        ]
+      };
+      return { content: JSON.stringify(mockJson), model: 'mock-mimo' };
+    }
     
     return { content: JSON.stringify({ success: true, message: "Mocked AI Response" }), model: 'mock-mimo' };
   }

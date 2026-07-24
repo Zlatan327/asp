@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 import { scoutAgent } from '@/lib/ai';
+import { parseCvFile } from '@/lib/cv/parse';
+import { scanAndPersistSocialAccounts } from '@/lib/social/scan';
+
+export const runtime = 'nodejs';
 
 export const POST = auth(async (req: any) => {
   try {
@@ -27,39 +31,40 @@ export const POST = auth(async (req: any) => {
     });
 
     if (role === 'FREELANCER') {
-      let extractedText = '';
-
-      if (cvFile) {
-        // In a real implementation, we would parse the PDF/DOCX using pdf-parse or mammoth
-        // For now, we simulate extraction.
-        extractedText = `Uploaded CV: ${cvFile.name}. Extracted simulated text.`;
-      }
+      const parsedCv = await parseCvFile(cvFile);
 
       // Fetch user's connected social accounts
       const socials = await prisma.socialAccount.findMany({
         where: { userId: session.user.id }
       });
+      const socialScans = await scanAndPersistSocialAccounts(session.user.id);
 
       // Prepare raw data for Scout Agent
       const rawData = {
-        cvText: extractedText,
+        cv: parsedCv,
+        cvText: parsedCv?.text || '',
         socials: socials.map(s => ({
           platform: s.platform,
           handle: s.handle,
           url: s.profileUrl
-        }))
+        })),
+        socialScans,
       };
 
       // Trigger the Scout Agent to generate the profile or use defaults if empty
       let scoutReport;
-      if (!cvFile && socials.length === 0) {
+      if (!parsedCv?.parsed && socials.length === 0) {
         scoutReport = {
           skills: [],
           experiences: [],
           education: [],
           credibilityScore: 0,
           badges: [],
-          narrative: "Started from scratch without uploading a CV or linking social accounts. Reputation is ready to be built from zero."
+          narrative: "Started from scratch without uploading a CV or linking social accounts. Reputation is ready to be built from zero.",
+          sources: {
+            cv: parsedCv ? { parsed: false, sections: [] } : undefined,
+          },
+          generatedAt: new Date().toISOString(),
         };
       } else {
         scoutReport = await scoutAgent.analyzeProfile(rawData);
@@ -69,21 +74,21 @@ export const POST = auth(async (req: any) => {
       await prisma.freelancerProfile.upsert({
         where: { userId: session.user.id },
         update: {
-          skills: JSON.stringify(scoutReport.skills),
-          experiences: JSON.stringify(scoutReport.experiences),
-          education: JSON.stringify(scoutReport.education),
+          skills: scoutReport.skills as any,
+          experiences: scoutReport.experiences as any,
+          education: scoutReport.education as any,
           credibilityScore: scoutReport.credibilityScore,
-          badges: JSON.stringify(scoutReport.badges),
-          scoutReport: JSON.stringify(scoutReport),
+          badges: scoutReport.badges as any,
+          scoutReport: scoutReport as any,
         },
         create: {
           userId: session.user.id,
-          skills: JSON.stringify(scoutReport.skills),
-          experiences: JSON.stringify(scoutReport.experiences),
-          education: JSON.stringify(scoutReport.education),
+          skills: scoutReport.skills as any,
+          experiences: scoutReport.experiences as any,
+          education: scoutReport.education as any,
           credibilityScore: scoutReport.credibilityScore,
-          badges: JSON.stringify(scoutReport.badges),
-          scoutReport: JSON.stringify(scoutReport),
+          badges: scoutReport.badges as any,
+          scoutReport: scoutReport as any,
         }
       });
       
@@ -93,13 +98,15 @@ export const POST = auth(async (req: any) => {
         update: {
           overallScore: scoutReport.credibilityScore,
           profileScore: scoutReport.credibilityScore,
-          badges: JSON.stringify(scoutReport.badges),
+          socialScore: socialScans.some(scan => scan.ok) ? Math.min(100, 50 + socialScans.filter(scan => scan.ok).length * 20) : 0,
+          badges: scoutReport.badges as any,
         },
         create: {
           userId: session.user.id,
           overallScore: scoutReport.credibilityScore,
           profileScore: scoutReport.credibilityScore,
-          badges: JSON.stringify(scoutReport.badges),
+          socialScore: socialScans.some(scan => scan.ok) ? Math.min(100, 50 + socialScans.filter(scan => scan.ok).length * 20) : 0,
+          badges: scoutReport.badges as any,
         }
       });
     } else {

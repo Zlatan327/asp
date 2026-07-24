@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { auth } from "@/auth";
-import { MockZKProvider } from "@/lib/verification";
+import { getVerificationProvider } from "@/lib/verification";
 import { ethers } from "ethers";
+
+export const runtime = 'nodejs';
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -31,8 +33,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ error: "Already claimed" }, { status: 400 });
     }
 
-    // 2. Verify ZK Proof using Strategy Pattern
-    const verifier = new MockZKProvider();
+    // 2. Verify ZK/social proof using configured provider.
+    const { provider: verifier, mode } = getVerificationProvider();
     const isValid = await verifier.verify(proofData, bounty.targetUrl);
 
     if (!isValid) {
@@ -65,7 +67,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         bountyId,
         userId,
         status: "VERIFIED",
-        proofData,
+        proofData: {
+          raw: proofData,
+          verificationMode: mode,
+          verifiedAt: new Date().toISOString(),
+        } as any,
         txHash,
         autoClaimed
       }
@@ -96,9 +102,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       });
     }
 
-    return NextResponse.json({ success: true, claim, signature });
+    return NextResponse.json({ success: true, claim, signature, verificationMode: mode });
   } catch (error) {
     console.error("POST /api/bounties/[id]/claim Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal Server Error" }, { status: 500 });
   }
 }

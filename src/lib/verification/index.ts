@@ -6,6 +6,28 @@ export interface IVerificationProvider {
   verify(proofData: string, targetUrl: string): Promise<boolean>;
 }
 
+export class ZkPassProvider implements IVerificationProvider {
+  constructor(private readonly verifyUrl: string, private readonly apiKey?: string) {}
+
+  async verify(proofData: string, targetUrl: string): Promise<boolean> {
+    const response = await fetch(this.verifyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.apiKey ? { Authorization: `Bearer ${this.apiKey}` } : {}),
+      },
+      body: JSON.stringify({ proofData, targetUrl }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Verifier rejected proof (${response.status})`);
+    }
+
+    const result = await response.json();
+    return result.valid === true || result.success === true;
+  }
+}
+
 export class MockZKProvider implements IVerificationProvider {
   async verify(proofData: string, targetUrl: string): Promise<boolean> {
     // In a real implementation, this would verify a zkPass or TLSNotary proof
@@ -27,5 +49,20 @@ export class MockZKProvider implements IVerificationProvider {
   }
 }
 
-// In the future, we can add a ZkPassProvider here and hot-swap it
-// export class ZkPassProvider implements IVerificationProvider { ... }
+export function getVerificationProvider(): { provider: IVerificationProvider; mode: 'real' | 'mock' } {
+  if (process.env.ZKPASS_VERIFY_URL) {
+    return {
+      provider: new ZkPassProvider(process.env.ZKPASS_VERIFY_URL, process.env.ZKPASS_API_KEY),
+      mode: 'real',
+    };
+  }
+
+  if (process.env.ENABLE_MOCK_ZK === 'true' || process.env.NODE_ENV !== 'production') {
+    return {
+      provider: new MockZKProvider(),
+      mode: 'mock',
+    };
+  }
+
+  throw new Error('No real ZK verifier configured. Set ZKPASS_VERIFY_URL or ENABLE_MOCK_ZK=true for demo mode.');
+}
