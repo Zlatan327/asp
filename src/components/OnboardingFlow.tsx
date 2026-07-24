@@ -20,6 +20,24 @@ const socialProviders = [
 const ONBOARDING_ROLE_KEY = 'klop:onboarding-role';
 const ONBOARDING_STEP_KEY = 'klop:onboarding-step';
 
+function readStoredOnboardingValue(key: string) {
+  return window.sessionStorage.getItem(key) || window.localStorage.getItem(key);
+}
+
+function persistOnboardingState(role: 'FREELANCER' | 'CLIENT', step = '2') {
+  window.sessionStorage.setItem(ONBOARDING_ROLE_KEY, role);
+  window.sessionStorage.setItem(ONBOARDING_STEP_KEY, step);
+  window.localStorage.setItem(ONBOARDING_ROLE_KEY, role);
+  window.localStorage.setItem(ONBOARDING_STEP_KEY, step);
+}
+
+function clearOnboardingState() {
+  window.sessionStorage.removeItem(ONBOARDING_ROLE_KEY);
+  window.sessionStorage.removeItem(ONBOARDING_STEP_KEY);
+  window.localStorage.removeItem(ONBOARDING_ROLE_KEY);
+  window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+}
+
 export default function OnboardingFlow() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -34,11 +52,15 @@ export default function OnboardingFlow() {
   const [socialsLoading, setSocialsLoading] = useState(false);
 
   useEffect(() => {
-    const savedRole = window.sessionStorage.getItem(ONBOARDING_ROLE_KEY);
-    const savedStep = window.sessionStorage.getItem(ONBOARDING_STEP_KEY);
+    const params = new URLSearchParams(window.location.search);
+    const roleParam = params.get('role');
+    const stepParam = params.get('step');
+    const savedRole = roleParam || readStoredOnboardingValue(ONBOARDING_ROLE_KEY);
+    const savedStep = stepParam === 'footprint' ? '2' : readStoredOnboardingValue(ONBOARDING_STEP_KEY);
 
     if (savedRole === 'FREELANCER' || savedRole === 'CLIENT') {
       setRole(savedRole);
+      persistOnboardingState(savedRole, savedStep === '2' ? '2' : '1');
     }
 
     if (savedStep === '2' && (savedRole === 'FREELANCER' || savedRole === 'CLIENT')) {
@@ -103,8 +125,7 @@ export default function OnboardingFlow() {
       }
 
       setAgentMessage('Profile generated successfully! Redirecting...');
-      window.sessionStorage.removeItem(ONBOARDING_ROLE_KEY);
-      window.sessionStorage.removeItem(ONBOARDING_STEP_KEY);
+      clearOnboardingState();
       await new Promise(r => setTimeout(r, 1000));
       
       router.push('/agent-dashboard');
@@ -161,8 +182,7 @@ export default function OnboardingFlow() {
               disabled={!role}
               onClick={() => {
                 if (role) {
-                  window.sessionStorage.setItem(ONBOARDING_ROLE_KEY, role);
-                  window.sessionStorage.setItem(ONBOARDING_STEP_KEY, '2');
+                  persistOnboardingState(role, '2');
                 }
                 setStep(2);
               }}
@@ -239,9 +259,11 @@ export default function OnboardingFlow() {
                             }}
                             onClick={() => {
                               if (!isConnected) {
-                                window.sessionStorage.setItem(ONBOARDING_ROLE_KEY, role || 'FREELANCER');
-                                window.sessionStorage.setItem(ONBOARDING_STEP_KEY, '2');
-                                signIn(provider.id, { callbackUrl: '/onboarding' });
+                                const selectedRole = role || 'FREELANCER';
+                                persistOnboardingState(selectedRole, '2');
+                                signIn(provider.id, {
+                                  callbackUrl: `/onboarding?step=footprint&role=${selectedRole}`,
+                                });
                               }
                             }}
                           >
@@ -287,6 +309,7 @@ export default function OnboardingFlow() {
                   className="btn btn-secondary"
                   onClick={() => {
                     window.sessionStorage.removeItem(ONBOARDING_STEP_KEY);
+                    window.localStorage.removeItem(ONBOARDING_STEP_KEY);
                     setStep(1);
                   }}
                   style={{ flex: 1 }}
