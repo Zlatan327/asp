@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
 import { redirect } from "next/navigation";
 import BountyClient from "./BountyClient";
+import { safeParseJson } from "@/lib/json";
 
 export default async function BountiesPage() {
   const session = await auth();
@@ -26,6 +27,8 @@ export default async function BountiesPage() {
   const tasksCompleted = user?.reputationScore?.tasksCompleted || 0;
   const srs = user?.reputationScore?.socialReliabilityScore || 50;
   const botUnlocked = tasksCompleted >= 10 && srs >= 90;
+  const reputationBadges = safeParseJson<any[]>(user?.reputationScore?.badges, []);
+  const rentedBot = reputationBadges.some((badge) => badge?.id === "autobot-rented");
 
   // Check social connections
   const hasTwitter = user?.socialAccounts?.some((s) => s.platform === "TWITTER") || false;
@@ -36,6 +39,7 @@ export default async function BountiesPage() {
       initialBounties={bounties} 
       userId={session.user.id} 
       botUnlocked={botUnlocked} 
+      rentedBot={rentedBot}
       srs={srs} 
       tasksCompleted={tasksCompleted}
       hasTwitter={hasTwitter}

@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 import Link from 'next/link';
 import { Bot, Activity, CheckCircle2, ShieldCheck, Sparkles, MessageSquare } from 'lucide-react';
+import AutoBotRunner from '@/components/AutoBotRunner';
 
 export default async function AgentDashboardPage() {
   const session = await auth();
@@ -120,6 +121,7 @@ export default async function AgentDashboardPage() {
                 <strong>500 USDT</strong>
               </div>
             </div>
+            <AutoBotRunner />
           </div>
         )}
 

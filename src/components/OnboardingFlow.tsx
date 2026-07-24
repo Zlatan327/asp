@@ -137,7 +137,7 @@ export default function OnboardingFlow() {
                     <div className="card" style={{ padding: 'var(--space-4)', borderStyle: 'dashed', textAlign: 'center' }}>
                       <input
                         type="file"
-                        accept=".pdf"
+                      accept=".pdf,.doc,.docx"
                         id="cv-upload"
                         onChange={(e) => setCvFile(e.target.files?.[0] || null)}
                         style={{ display: 'none' }}

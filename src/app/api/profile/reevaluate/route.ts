@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/db/prisma';
 import { scoutAgent } from '@/lib/ai';
+import { scanAndPersistSocialAccounts } from '@/lib/social/scan';
+
+export const runtime = 'nodejs';
 
 export const POST = auth(async (req: any) => {
   try {
@@ -19,12 +22,19 @@ export const POST = auth(async (req: any) => {
       return NextResponse.json({ error: 'No social accounts to evaluate' }, { status: 400 });
     }
 
+    const socialScans = await scanAndPersistSocialAccounts(session.user.id);
+    const existingProfile = await prisma.freelancerProfile.findUnique({
+      where: { userId: session.user.id },
+    });
+
     const rawData = {
       socials: socials.map(s => ({
         platform: s.platform,
         handle: s.handle,
         url: s.profileUrl
-      }))
+      })),
+      socialScans,
+      previousScoutReport: existingProfile?.scoutReport,
     };
 
     // Trigger AI Reevaluation
@@ -34,21 +44,21 @@ export const POST = auth(async (req: any) => {
     await prisma.freelancerProfile.upsert({
       where: { userId: session.user.id },
       update: {
-        skills: JSON.stringify(scoutReport.skills),
-        experiences: JSON.stringify(scoutReport.experiences),
-        education: JSON.stringify(scoutReport.education),
+        skills: scoutReport.skills as any,
+        experiences: scoutReport.experiences as any,
+        education: scoutReport.education as any,
         credibilityScore: scoutReport.credibilityScore,
-        badges: JSON.stringify(scoutReport.badges),
-        scoutReport: JSON.stringify(scoutReport),
+        badges: scoutReport.badges as any,
+        scoutReport: scoutReport as any,
       },
       create: {
         userId: session.user.id,
-        skills: JSON.stringify(scoutReport.skills),
-        experiences: JSON.stringify(scoutReport.experiences),
-        education: JSON.stringify(scoutReport.education),
+        skills: scoutReport.skills as any,
+        experiences: scoutReport.experiences as any,
+        education: scoutReport.education as any,
         credibilityScore: scoutReport.credibilityScore,
-        badges: JSON.stringify(scoutReport.badges),
-        scoutReport: JSON.stringify(scoutReport),
+        badges: scoutReport.badges as any,
+        scoutReport: scoutReport as any,
       }
     });
     
@@ -58,17 +68,27 @@ export const POST = auth(async (req: any) => {
       update: {
         overallScore: scoutReport.credibilityScore,
         profileScore: scoutReport.credibilityScore,
-        badges: JSON.stringify(scoutReport.badges),
+        socialScore: socialScans.some(scan => scan.ok) ? Math.min(100, 50 + socialScans.filter(scan => scan.ok).length * 20) : 0,
+        badges: scoutReport.badges as any,
       },
       create: {
         userId: session.user.id,
         overallScore: scoutReport.credibilityScore,
         profileScore: scoutReport.credibilityScore,
-        badges: JSON.stringify(scoutReport.badges),
+        socialScore: socialScans.some(scan => scan.ok) ? Math.min(100, 50 + socialScans.filter(scan => scan.ok).length * 20) : 0,
+        badges: scoutReport.badges as any,
       }
     });
 
-    return NextResponse.json({ success: true, score: scoutReport.credibilityScore });
+    return NextResponse.json({
+      success: true,
+      score: scoutReport.credibilityScore,
+      socialScans: socialScans.map(scan => ({
+        platform: scan.platform,
+        ok: scan.ok,
+        warnings: scan.warnings,
+      })),
+    });
   } catch (error) {
     console.error('Reevaluate API Error:', error);
     return NextResponse.json(

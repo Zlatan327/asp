@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 export default function NewGigPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [drafting, setDrafting] = useState(false);
+  const [formData, setFormData] = useState<any>({
     title: '',
     description: '',
     budget: '',
@@ -14,14 +15,45 @@ export default function NewGigPage() {
     experienceLevel: 'INTERMEDIATE',
     skills: '',
     estimatedDuration: '',
+    milestones: [],
   });
+
+  const handleAiAssist = async () => {
+    const idea = [formData.title, formData.description, formData.skills].filter(Boolean).join('\n');
+    setDrafting(true);
+    try {
+      const res = await fetch('/api/gigs/draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idea: idea || 'Build a Web3 product feature with clear milestones and escrow-ready deliverables.' }),
+      });
+      const draft = await res.json();
+      if (!res.ok) throw new Error(draft.error || 'Failed to draft gig');
+
+      setFormData({
+        title: draft.title || formData.title,
+        description: draft.description || formData.description,
+        budget: String(draft.budget || formData.budget || ''),
+        budgetType: draft.budgetType || formData.budgetType,
+        experienceLevel: draft.experienceLevel || formData.experienceLevel,
+        skills: Array.isArray(draft.skills) ? draft.skills.join(', ') : formData.skills,
+        estimatedDuration: draft.estimatedDuration || formData.estimatedDuration,
+        milestones: draft.milestones || [],
+      });
+    } catch (error) {
+      console.error(error);
+      alert(error instanceof Error ? error.message : 'AI Assist failed');
+    } finally {
+      setDrafting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const skillsArray = formData.skills.split(',').map(s => s.trim()).filter(s => s);
+      const skillsArray = String(formData.skills).split(',').map((s: string) => s.trim()).filter((s: string) => s);
       
       const res = await fetch('/api/gigs', {
         method: 'POST',
@@ -29,6 +61,7 @@ export default function NewGigPage() {
         body: JSON.stringify({
           ...formData,
           skills: skillsArray,
+          milestones: formData.milestones,
         }),
       });
 
@@ -71,11 +104,9 @@ export default function NewGigPage() {
               <span 
                 className="badge badge-info" 
                 style={{ marginLeft: 8, cursor: 'pointer' }}
-                onClick={() => {
-                  setFormData({...formData, description: "We are looking for an experienced Web3 developer to build a smart contract for our new project. The ideal candidate will have 3+ years of Solidity experience and a strong understanding of ERC-20 standards. Deliverables include the contract, unit tests, and deployment scripts."});
-                }}
+                onClick={handleAiAssist}
               >
-                ✨ Use AI Assist
+                {drafting ? 'Drafting...' : '✨ Use AI Assist'}
               </span>
             </label>
             <textarea 
@@ -139,6 +170,23 @@ export default function NewGigPage() {
               />
             </div>
           </div>
+
+          {formData.milestones?.length > 0 && (
+            <div>
+              <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>AI Milestones</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                {formData.milestones.map((milestone: any, index: number) => (
+                  <div key={`${milestone.title}-${index}`} style={{ padding: 'var(--space-3)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.03)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 'var(--space-3)', marginBottom: 'var(--space-1)' }}>
+                      <strong>{milestone.title}</strong>
+                      <span style={{ color: 'var(--color-accent-primary)', fontWeight: 700 }}>{milestone.amount || 0} USDT</span>
+                    </div>
+                    <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>{milestone.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div style={{ marginTop: 'var(--space-4)', display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-4)' }}>
             <button type="button" className="btn btn-secondary" onClick={() => router.back()}>Cancel</button>
