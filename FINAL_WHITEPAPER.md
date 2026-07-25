@@ -47,5 +47,27 @@ The gig discovery and application process adapts based on the user's reputation 
 4. **Escrow & Payment:** Funds for gigs are locked into a secure Escrow Panel. Upon successful milestone completion and client verification, funds are instantly released to the freelancer's connected wallet.
 5. **Reputation & Rewards (SBTs):** Consistently delivering quality work increases the user's credibility score. Getting to a certain score unlocks a lot more features alongside an on-chain Soulbound Token (SBT) representing their proven, immutable reputation.
 
-## 5. Conclusion
+## 5. Next Phase: Architectural Evolution
+
+To transition SkillMint from a robust prototype into a production-grade decentralized protocol, the next phase of development will address several critical structural requirements:
+
+### 5.1 Sybil-Resistance & Immutable Identity
+While the current reputation system relies on the `SkillMint Reputation` SBT (Soulbound Token), it currently lacks robust defense against Sybil attacks (reputation farming via multiple wallets). The next phase will integrate "Proof of Personhood" protocols such as **Gitcoin Passport**, **WorldID**, or **OKX KYC** to ensure reputation is tied to verified human actors.
+
+### 5.2 Decentralized Human Dispute Fallback
+Currently, the AI Arbiter Agent automates dispute resolution based on cryptographic proofs of work (e.g., GitHub commits). To mitigate the risk of AI hallucination or prompt injection, we will implement a decentralized human fallback layer. Integrations with decentralized courts like **Kleros** or a specialized multi-sig DAO will allow users to appeal automated decisions.
+
+### 5.3 ERC-4337 Account Abstraction (Gasless UX)
+To achieve seamless Web2-like onboarding, freelancers should not be required to hold native gas tokens (e.g., OKB, ETH) simply to claim their earnings or mint their reputation tokens. The integration of **ERC-4337 Paymasters** will allow the SkillMint protocol to sponsor transaction fees, abstracting away gas complexities.
+
+### 5.4 Native Wallet-to-Wallet Messaging
+Relying on off-chain, centralized databases for client-freelancer communication is a Web3 anti-pattern. We will integrate **XMTP (Extensible Message Transport Protocol)** to facilitate secure, end-to-end encrypted messaging directly between OKX wallets.
+
+### 5.5 Enterprise Data Privacy (ZK Proofs)
+Enterprise clients require privacy for proprietary project scopes. Beyond the current `ZkVerificationModal` used for skill proving, the architecture will evolve to use Zero-Knowledge proofs and encrypted data availability layers to keep gig deliverables, requirements, and proposals strictly confidential between the hired freelancer and the client.
+
+### 5.6 Optimistic Oracles for Deliverables
+Currently, the escrow contract relies on the centralized backend (AI orchestrator) to trigger milestone releases. To remove this centralized bottleneck, the protocol will adopt an **Optimistic Oracle (e.g., UMA)**. Freelancers will assert milestone completion on-chain; if the client does not dispute it within a challenge window, funds are released entirely trustlessly.
+
+## 6. Conclusion
 SkillMint represents the convergence of autonomous AI agents, transparent web3 payments, and a frictionless creator economy. This architecture ensures high scalability, supreme aesthetic quality, and unprecedented ease of use.
