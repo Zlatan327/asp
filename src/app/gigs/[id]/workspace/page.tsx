@@ -29,6 +29,9 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
   const [tasks, setTasks] = useState<GigTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [arbiterUrl, setArbiterUrl] = useState('');
+  const [arbiterLoading, setArbiterLoading] = useState(false);
+  const [arbiterResult, setArbiterResult] = useState<{decision: string, confidenceScore: number, reasoning: string} | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -80,6 +83,26 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Failed to update status');
       fetchData(); // revert
+    }
+  };
+
+  const handleArbiterReview = async () => {
+    if (!arbiterUrl) return;
+    setArbiterLoading(true);
+    setArbiterResult(null);
+    try {
+      const res = await fetch('/api/ai/arbiter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gigId: unwrappedParams.id, submissionUrl: arbiterUrl })
+      });
+      if (!res.ok) throw new Error('Arbiter failed');
+      const data = await res.json();
+      setArbiterResult(data);
+    } catch (e) {
+      alert('Failed to get Arbiter review');
+    } finally {
+      setArbiterLoading(false);
     }
   };
 
@@ -193,6 +216,40 @@ export default function GigWorkspacePage({ params }: { params: Promise<{ id: str
               isClient={isClient} 
               onEscrowCreated={() => fetchData()} 
             />
+            
+            <div className="glass-card" style={{ padding: 'var(--space-6)' }}>
+              <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>Arbiter Agent</h3>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}>
+                Submit a PR or deliverable link for AI review.
+              </p>
+              
+              <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+                <input 
+                  type="url" 
+                  placeholder="https://github.com/..." 
+                  className="input" 
+                  style={{ flex: 1 }}
+                  value={arbiterUrl}
+                  onChange={e => setArbiterUrl(e.target.value)}
+                />
+                <button className="btn btn-secondary" onClick={handleArbiterReview} disabled={arbiterLoading || !arbiterUrl}>
+                  {arbiterLoading ? 'Reviewing...' : 'Review'}
+                </button>
+              </div>
+
+              {arbiterResult && (
+                <div style={{ padding: 'var(--space-4)', background: 'var(--color-bg-elevated)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
+                    <span style={{ fontWeight: 600, color: arbiterResult.decision === 'APPROVE' ? 'var(--color-success)' : 'var(--color-warning)' }}>
+                      {arbiterResult.decision} ({arbiterResult.confidenceScore}%)
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
+                    {arbiterResult.reasoning}
+                  </p>
+                </div>
+              )}
+            </div>
             
             {gig.status === 'DONE' && (
               <div className="card" style={{ padding: 'var(--space-6)' }}>

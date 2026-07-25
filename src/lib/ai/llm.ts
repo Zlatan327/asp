@@ -60,7 +60,7 @@ export async function chatCompletion(
     
     const systemPrompt = messages.find(m => m.role === 'system')?.content || '';
     
-    if (systemPrompt.includes('ASP Proposal Agent')) {
+    if (systemPrompt.includes('SkillMint Proposal Agent')) {
       const mockJson = {
         coverLetter: "Hi there! I am a highly skilled Web3 developer with extensive experience in Next.js and the X Layer ecosystem. I have reviewed the requirements for this gig and I am extremely confident I can deliver high-quality results ahead of your deadline. My Auto-Bot agent has verified that my GitHub repository history perfectly aligns with your required skills.\n\nI am ready to begin immediately and will utilize the X Layer USDT Escrow to guarantee trust. Looking forward to working with you!",
         suggestedBid: 150,
@@ -71,7 +71,7 @@ export async function chatCompletion(
       return { content: JSON.stringify(mockJson), model: 'mock-mimo' };
     }
 
-    if (systemPrompt.includes('ASP Scout Agent')) {
+    if (systemPrompt.includes('SkillMint Scout Agent')) {
       const mockJson = {
         skills: [
           { name: 'React', category: 'Frontend', confidence: 92, sources: ['cv', 'github'] },
@@ -113,7 +113,7 @@ export async function chatCompletion(
       return { content: JSON.stringify(mockJson), model: 'mock-mimo' };
     }
 
-    if (systemPrompt.includes('KLOP PM Agent')) {
+    if (systemPrompt.includes('SkillMint PM Agent')) {
       const mockJson = {
         title: 'Build an X Layer escrow dashboard',
         description: 'Create a production-ready dashboard where clients can fund milestone escrow, freelancers can submit deliverables, and both parties can track payment status on X Layer. Deliverables include responsive UI, wallet connection, contract reads/writes, and deployment-ready documentation.',

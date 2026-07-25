@@ -4,7 +4,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 /**
- * ASP Platform — Escrow Contract Test Suite
+ * SkillMint Platform — Escrow Contract Test Suite
  *
  * Covers:
  *   - EscrowFactory: creation, validation, registry
@@ -14,7 +14,7 @@ import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
  *   - Edge cases and state transitions
  */
 
-describe("ASP Escrow System", function () {
+describe("SkillMint Escrow System", function () {
   // ──────────────────────────────────────────────
   //  Fixture: deploys factory, mock token, and creates an escrow
   // ──────────────────────────────────────────────
@@ -641,8 +641,8 @@ describe("ReputationSBT", function () {
 
   it("should deploy with correct name and symbol", async function () {
     const { sbt } = await loadFixture(deployReputationFixture);
-    expect(await sbt.name()).to.equal("ASP Reputation");
-    expect(await sbt.symbol()).to.equal("ASPR");
+    expect(await sbt.name()).to.equal("SkillMint Reputation");
+    expect(await sbt.symbol()).to.equal("SKMR");
   });
 
   it("should allow platform to mint SBT", async function () {

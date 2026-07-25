@@ -1,7 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 
 /**
- * ASP Platform — Hardhat Configuration
+ * SkillMint Platform — Hardhat Configuration
  *
  * Networks:
  *   - X Layer Mainnet (chainId 196)

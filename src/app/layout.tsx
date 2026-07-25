@@ -3,12 +3,12 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "KLOP — Freelancer & Indie Creator Agent Service Provider",
+  title: "SkillMint — AI-Powered Freelance Marketplace",
   description:
     "AI-powered co-pilot connecting freelancers with clients through verifiable profiles, multi-agent orchestration, and trustless stablecoin escrow on X Layer. Built for the OKX.AI marketplace.",
   keywords: [
     "freelancer",
-    "agent service provider",
+    "skillmint",
     "OKX.AI",
     "X Layer",
     "blockchain",
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "verifiable reputation",
   ],
   openGraph: {
-    title: "KLOP — Freelancer & Indie Creator Agent Service Provider",
+    title: "SkillMint — AI-Powered Freelance Marketplace",
     description:
       "Next-generation AI co-pilot for freelancers and clients on OKX.AI. Verifiable profiles, smart escrow, and multi-agent orchestration.",
     type: "website",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "KLOP — Freelancer & Indie Creator Agent Service Provider",
+    title: "SkillMint — AI-Powered Freelance Marketplace",
     description:
       "AI-powered freelancer marketplace on OKX.AI with verifiable reputation and trustless crypto escrow.",
   },

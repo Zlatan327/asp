@@ -1,6 +1,6 @@
-# ASP — VPS Deployment Guide
+# SkillMint — VPS Deployment Guide
 
-This guide covers deploying the ASP platform on a Linux VPS (Ubuntu/Debian).
+This guide covers deploying the SkillMint platform on a Linux VPS (Ubuntu/Debian).
 
 ---
 
@@ -15,8 +15,8 @@ This guide covers deploying the ASP platform on a Linux VPS (Ubuntu/Debian).
 ## Step 1: Clone & Install
 
 ```bash
-git clone <repo-url> asp
-cd asp
+git clone <repo-url> skillmint
+cd skillmint
 npm install
 ```
 
@@ -58,7 +58,7 @@ npm run build
 npm install -g pm2
 
 # Start the app
-pm2 start npm --name "asp" -- start
+pm2 start npm --name "skillmint" -- start
 
 # Auto-restart on reboot
 pm2 startup
@@ -109,8 +109,8 @@ Visit `https://yourdomain.com` and confirm:
 
 | Action | Command |
 |---|---|
-| Start | `pm2 start asp` |
-| Stop | `pm2 stop asp` |
-| Restart | `pm2 restart asp` |
-| Logs | `pm2 logs asp` |
-| Rebuild | `npm run build; pm2 restart asp` |
+| Start | `pm2 start skillmint` |
+| Stop | `pm2 stop skillmint` |
+| Restart | `pm2 restart skillmint` |
+| Logs | `pm2 logs skillmint` |
+| Rebuild | `npm run build; pm2 restart skillmint` |

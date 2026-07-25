@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 import { auth } from '@/auth';
+import { runAutoBidderForGig } from '@/lib/ai/autobid';
 
 // Fetch active gigs (Marketplace)
 export async function GET(req: Request) {
@@ -63,6 +64,9 @@ export async function POST(req: Request) {
         skills: (data.skills || []) as any,
       },
     });
+
+    // Run Auto-Bidder (await to ensure it doesn't get killed in serverless)
+    await runAutoBidderForGig(newGig.id).catch(console.error);
 
     return NextResponse.json(newGig, { status: 201 });
   } catch (error) {

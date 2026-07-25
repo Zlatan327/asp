@@ -19,7 +19,7 @@ export default function ZkVerificationModal({ targetUrl, onSuccess, onClose }: P
     "Executing zero-knowledge circuits...",
     "Generating cryptographic proof receipt...",
     "Verifying math constraints locally...",
-    "Proof Generated Successfully! Sending to ASP Oracle."
+    "Proof Generated Successfully! Sending to SkillMint Oracle."
   ];
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function ZkVerificationModal({ targetUrl, onSuccess, onClose }: P
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <h3 className="font-semibold text-white/90 text-sm">ZK-Proof Verification</h3>
+            <h3 className="font-semibold text-white/90 text-sm">ZK-Proof Verification (Demo)</h3>
           </div>
           <button onClick={onClose} className="text-white/50 hover:text-white transition-colors">
             <XCircle className="w-5 h-5" />
@@ -58,7 +58,7 @@ export default function ZkVerificationModal({ targetUrl, onSuccess, onClose }: P
               <Cpu className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <div className="text-white/80">Local Browser Oracle (zkPass)</div>
+              <div className="text-white/80">Local Browser Oracle (Simulated for Demo)</div>
               <div className="text-white/40 text-xs">Computing ZK-SNARK...</div>
             </div>
           </div>

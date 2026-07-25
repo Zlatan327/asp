@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     }
 
     const draft = await askJson<GigDraft>(
-      `You are the KLOP PM Agent. Convert a client's raw project idea into a clear freelance gig.
+      `You are the SkillMint PM Agent. Convert a client's raw project idea into a clear freelance gig.
 Return JSON with title, description, budget, budgetType, experienceLevel, skills, estimatedDuration, and milestones.
 Use USDT budget numbers. Keep the scope practical for a hackathon marketplace.`,
       `Client project idea:\n${input}`,

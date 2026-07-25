@@ -205,7 +205,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       {address && !isCorrectChain && (
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: 'var(--color-error)', color: 'white', padding: 'var(--space-3)', textAlign: 'center', zIndex: 9999 }}>
           <p style={{ margin: 0, fontWeight: 600 }}>
-            Wrong Network Detected! Please switch to X Layer Testnet to use ASP.
+            Wrong Network Detected! Please switch to X Layer Testnet to use SkillMint.
             <button onClick={switchChain} style={{ marginLeft: 'var(--space-4)', padding: 'var(--space-1) var(--space-3)', background: 'white', color: 'var(--color-error)', borderRadius: 'var(--radius-sm)', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
               Switch Network
             </button>

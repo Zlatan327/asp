@@ -1,4 +1,4 @@
-// Prisma Schema for the ASP Freelancer & Indie Creator platform
+// Prisma Schema for the SkillMint Freelancer & Indie Creator platform
 // Database: PostgreSQL (or SQLite for dev)
 
 generator client {

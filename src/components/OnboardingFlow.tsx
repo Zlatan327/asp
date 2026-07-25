@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signIn } from 'next-auth/react';
-import { Bot, UploadCloud, Building2, UserCircle2, Loader2, Link as LinkIcon } from 'lucide-react';
+import { Bot, UploadCloud, Building2, UserCircle2, Loader2, Link as LinkIcon, Award } from 'lucide-react';
+import { EscrowService } from '@/lib/blockchain/contracts';
 
 export default function OnboardingFlow() {
   const { data: session } = useSession();
@@ -15,6 +16,9 @@ export default function OnboardingFlow() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [companyName, setCompanyName] = useState('');
   const [agentMessage, setAgentMessage] = useState('Initializing Scout Agent...');
+  const [scoutReport, setScoutReport] = useState<any>(null);
+  const [mintingSbt, setMintingSbt] = useState(false);
+  const [sbtMinted, setSbtMinted] = useState(false);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -38,18 +42,22 @@ export default function OnboardingFlow() {
         credentials: 'include',
       });
 
+      const data = await res.json();
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
         if (res.status === 401) {
-          throw new Error('Unauthorized: ' + (errorData.details || ''));
+          throw new Error('Unauthorized: ' + (data.details || ''));
         }
-        throw new Error(errorData.error || errorData.details || 'Onboarding failed');
+        throw new Error(data.error || data.details || 'Onboarding failed');
       }
 
-      setAgentMessage('Profile generated successfully! Redirecting...');
-      await new Promise(r => setTimeout(r, 1000));
-      
-      router.push('/agent-dashboard');
+      setAgentMessage('Profile generated successfully!');
+      if (role === 'FREELANCER' && data.scoutReport) {
+        setScoutReport(data.scoutReport);
+        setStep(4);
+      } else {
+        await new Promise(r => setTimeout(r, 1000));
+        router.push('/agent-dashboard');
+      }
     } catch (err: any) {
       console.error(err);
       if (err.message === 'Unauthorized') {
@@ -73,7 +81,7 @@ export default function OnboardingFlow() {
           <div className="animate-fade-in-up">
             <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
               <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
-                Welcome to KLOP
+                Welcome to SkillMint
               </h1>
               <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
                 How do you want to use the platform?
@@ -206,6 +214,94 @@ export default function OnboardingFlow() {
             <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-lg)' }}>
               {agentMessage}
             </p>
+          </div>
+        )}
+
+        {/* Step 4: Verification Result */}
+        {step === 4 && scoutReport && (
+          <div className="animate-fade-in-up">
+            <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+              <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
+                Verified Profile Ready
+              </h1>
+              <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+                Scout Agent has extracted and verified your capabilities.
+              </p>
+            </div>
+            
+            <div className="card" style={{ padding: 'var(--space-6)', marginBottom: 'var(--space-6)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+                <div style={{ fontSize: 'var(--text-lg)', fontWeight: 700 }}>Credibility Score</div>
+                <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, color: 'var(--color-accent-primary)' }}>
+                  {scoutReport.credibilityScore} <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)', fontWeight: 500 }}>/ 100</span>
+                </div>
+              </div>
+              
+              <div style={{ marginBottom: 'var(--space-4)' }}>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)' }}>Verified Skills</div>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                  {scoutReport.skills?.map((skill: any) => (
+                    <span key={skill.name} className="skill-tag">
+                      {skill.name} <span style={{ opacity: 0.6, fontSize: '0.8em' }}>{skill.confidence}%</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 'var(--space-2)' }}>Key Strengths</div>
+                <ul style={{ paddingLeft: 'var(--space-4)', margin: 0, fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>
+                  {scoutReport.strengths?.map((s: string, i: number) => (
+                    <li key={i} style={{ marginBottom: 'var(--space-1)' }}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {!sbtMinted ? (
+              <button
+                disabled={mintingSbt}
+                onClick={async () => {
+                  setMintingSbt(true);
+                  try {
+                    // For the demo, we assume the user's wallet is connected or will prompt.
+                    // Pass a dummy IPFS hash or metadata string as the token URI
+                    const mockTokenUri = `ipfs://QmProfile${session?.user?.id}`;
+                    
+                    // We need the user's address. If wallet provider prompts them, getProvider handles it.
+                    // But we actually need to pass the user's address to mintReputationSBT. 
+                    // Let's get it from the signer inside the function.
+                    // Wait, EscrowService.mintReputationSBT takes (userAddress, tokenURI)
+                    const { getProvider } = await import('@/lib/blockchain/contracts');
+                    const provider = await getProvider();
+                    const signer = await provider.getSigner();
+                    await EscrowService.mintReputationSBT(signer.address, mockTokenUri);
+                    
+                    setSbtMinted(true);
+                    alert('Successfully Minted your Reputation SBT to X Layer!');
+                  } catch (err: any) {
+                    alert('Failed to mint SBT: ' + err.message);
+                  } finally {
+                    setMintingSbt(false);
+                  }
+                }}
+                className="btn btn-primary btn-lg w-full"
+                style={{ marginBottom: 'var(--space-4)', background: 'linear-gradient(90deg, var(--color-accent-primary), var(--color-accent-secondary))' }}
+              >
+                {mintingSbt ? 'Minting on X Layer...' : <><Award size={20} /> Mint Profile SBT On-Chain</>}
+              </button>
+            ) : (
+              <div className="alert alert-success" style={{ marginBottom: 'var(--space-4)', textAlign: 'center' }}>
+                <strong>Verified On-Chain!</strong> Your SBT is securely minted.
+              </div>
+            )}
+
+            <button
+              onClick={() => router.push('/agent-dashboard')}
+              className={`btn btn-${sbtMinted ? 'primary' : 'secondary'} btn-lg w-full`}
+            >
+              Go to Dashboard
+            </button>
           </div>
         )}
 

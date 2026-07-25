@@ -111,10 +111,21 @@ export default async function DashboardPage() {
 
             <div>
               <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>Verified Skills</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
                 {safeParseJson<any[]>(user.freelancerProfile.skills as any, []).map((skill: any) => (
                   <span key={skill.name} className="skill-tag">
                     {skill.name} <span style={{ opacity: 0.5, marginLeft: 4 }}>{skill.confidence}%</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 style={{ fontSize: 'var(--text-sm)', fontWeight: 600, marginBottom: 'var(--space-3)' }}>Key Strengths</h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {safeParseJson<any>(user.freelancerProfile.scoutReport as any, { strengths: [] }).strengths?.map((strength: string) => (
+                  <span key={strength} className="badge badge-info">
+                    ✨ {strength}
                   </span>
                 ))}
               </div>

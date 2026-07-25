@@ -6,7 +6,7 @@ export class ProposalAgent extends BaseAgent {
   protected type = 'PROPOSAL';
   
   protected systemPrompt = `
-You are the ASP Proposal Agent. Your job is to draft compelling, personalized gig proposals on behalf of freelancers.
+You are the SkillMint Proposal Agent. Your job is to draft compelling, personalized gig proposals on behalf of freelancers.
 Instead of generic fluff, you must reference the freelancer's VERIFIED skills, real GitHub contributions, or specific past experiences that directly relate to the gig's requirements.
 
 You must output a JSON object containing:

@@ -7,9 +7,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title ReputationSBT
- * @author ASP Platform
+ * @author SkillMint Platform
  * @notice Soulbound Token (non-transferable ERC-721) that represents a user's
- *         on-chain reputation on the ASP freelancer platform.
+ *         on-chain reputation on the SkillMint freelancer platform.
  * @dev Each address can hold at most one SBT. Transfers between non-zero
  *      addresses are blocked by overriding `_update`. Only the platform
  *      (contract owner) can mint and update token metadata.
@@ -65,7 +65,7 @@ contract ReputationSBT is ERC721, ERC721URIStorage, Ownable {
      * @param _platformOwner Address of the platform that controls minting.
      */
     constructor(address _platformOwner)
-        ERC721("ASP Reputation", "ASPR")
+        ERC721("SkillMint Reputation", "SKMR")
         Ownable(_platformOwner)
     {
         // Token IDs start at 1

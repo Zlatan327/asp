@@ -1,6 +1,6 @@
 <div align="center">
-  <h1>🤖 ASP: Agent Service Provider</h1>
-  <p><strong>A Next-Generation AI-Orchestrated Freelance Marketplace on X Layer</strong></p>
+  <h1>🤖 SkillMint</h1>
+  <p><strong>AI-Powered Freelance Marketplace on X Layer</strong></p>
 </div>
 
 ---
@@ -9,13 +9,13 @@
 
 Traditional freelancing platforms (Upwork, Fiverr) are broken. They force humans to do tedious "meta-work": freelancers spend countless hours writing proposals and bidding on jobs, while clients spend hours vetting portfolios and worrying about scams.
 
-**ASP (Agent Service Provider)** solves this by introducing a marketplace designed specifically for the AI era. Instead of manual matchmaking, users employ autonomous AI Agents to represent them, secured by trustless **X Layer Smart Contracts**. 
+**SkillMint** solves this by introducing a marketplace designed specifically for the AI era. Instead of manual matchmaking, users employ autonomous AI Agents to represent them, secured by trustless **X Layer Smart Contracts**. 
 
 ## ✨ Core Features
 
 ### 1. Autonomous AI Agents
 - **The Scout Agent (For Freelancers):** Freelancers link their GitHub and upload their CVs. The Scout Agent parses their verifiable experience and builds a highly accurate profile. 
-- **The Auto-Bot:** Once a freelancer completes enough gigs and hits a Social Reliability Score (SRS) of 90+, they unlock the Auto-Bot. This agent autonomously scans the marketplace, drafts proposals, and bids on perfectly matched gigs while the freelancer sleeps.
+- **The Auto-Bot:** This agent autonomously scans the marketplace, drafts proposals, and bids on perfectly matched gigs while the freelancer sleeps. Freelancers can unlock it organically (completing 10+ gigs and hitting a Social Reliability Score of 90+) or instantly by making an initial deposit (renting the bot).
 - **The Project Manager Agent (For Clients):** Clients chat with an AI assistant to scope out their ideas, break large projects into actionable milestones, and automatically match with the best talent.
 
 ### 2. Trustless Web3 Escrow
@@ -25,7 +25,7 @@ Because AI agents are negotiating at lightning speed, they need an infallible fi
 
 ### 3. Immutable Reputation (SBTs)
 - When a gig is completed successfully, the Escrow contract mints a **Soulbound Token (SBT)** directly to the freelancer's wallet.
-- This acts as permanent, on-chain proof of their work history. Reputation on ASP is mathematically backed by the blockchain and cannot be faked or manipulated.
+- This acts as permanent, on-chain proof of their work history. Reputation on SkillMint is mathematically backed by the blockchain and cannot be faked or manipulated.
 
 ---
 
@@ -73,12 +73,12 @@ Because AI agents are negotiating at lightning speed, they need an infallible fi
 
 The app includes a submission control room at `/okxai` with:
 
-- ASP positioning and category
+- SkillMint positioning and category
 - 90-second demo script
 - OKX.AI listing readiness checklist
 - X participation post draft for `#OKXAI`
 
-Use this route as the reviewer-facing demo hub before submitting the ASP for OKX.AI marketplace review.
+Use this route as the reviewer-facing demo hub before submitting SkillMint for OKX.AI marketplace review.
 
 ---
 
@@ -87,5 +87,5 @@ Use this route as the reviewer-facing demo hub before submitting the ASP for OKX
 1. Provision an Ubuntu VPS and install Node.js, Git, and PM2.
 2. Clone the repository and `npm install`.
 3. Build the Next.js application with `npm run build`.
-4. Run the production server via PM2: `pm2 start npm --name "asp-platform" -- start`.
+4. Run the production server via PM2: `pm2 start npm --name "skillmint" -- start`.
 5. Set up an Nginx reverse proxy with SSL via Certbot to route traffic to port 3000.
