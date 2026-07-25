@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db/prisma';
 import { askJson } from '@/lib/ai/llm';
 
@@ -10,7 +11,7 @@ export async function runAutoBidderForGig(gigId: string) {
     // For demo purposes, we fetch any freelancer with a scoutReport.
     const freelancers = await prisma.freelancerProfile.findMany({
       where: {
-        scoutReport: { not: null },
+        scoutReport: { not: Prisma.AnyNull },
         user: {
           proposals: { none: { gigId } }
         }

@@ -109,6 +109,7 @@ function fallbackScoutReport(rawData: Record<string, any>, reason?: string): Sco
 
   return {
     skills,
+    strengths: [],
     experiences: [],
     education: [],
     badges: [
@@ -132,6 +133,7 @@ function normalizeReport(rawData: Record<string, any>, report: Partial<ScoutRepo
 
   return {
     skills,
+    strengths: Array.isArray(report.strengths) ? report.strengths : [],
     experiences: Array.isArray(report.experiences) ? report.experiences : [],
     education: Array.isArray(report.education) ? report.education : [],
     badges,
