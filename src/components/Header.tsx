@@ -21,7 +21,7 @@ export default async function Header() {
           <path d="M 35 50 Q 50 35 65 50 Q 50 65 35 50 Z" fill="var(--color-bg-primary)" />
           <circle cx="50" cy="50" r="5" fill="currentColor" />
         </svg>
-        KLOP<span style={{ color: 'var(--color-accent-primary)' }}>.</span>
+        SkillMint<span style={{ color: 'var(--color-accent-primary)' }}>.</span>
       </Link>
       
       <Navigation session={session} />

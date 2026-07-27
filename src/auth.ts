@@ -133,6 +133,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       // Link social account
       if (account && account.provider !== 'siwe' && account.provider !== 'credentials') {
+        let scanData = null;
+        
+        try {
+          if (account.provider === 'github' && account.access_token) {
+            // Fetch recent repos for GitHub
+            const res = await fetch('https://api.github.com/user/repos?sort=updated&per_page=5', {
+              headers: { Authorization: `Bearer ${account.access_token}` }
+            });
+            if (res.ok) {
+              const repos = await res.json();
+              scanData = { 
+                recentRepos: repos.map((r: any) => ({ name: r.name, language: r.language, stars: r.stargazers_count })) 
+              };
+            }
+          } else if (account.provider === 'twitter' && account.access_token) {
+            // Fetch basic metrics for Twitter if available in profile
+            scanData = { followerCount: p?.data?.public_metrics?.followers_count || p?.followers_count || 0 };
+          }
+        } catch(e) {
+          console.error("Error fetching social data:", e);
+        }
+
         await prisma.socialAccount.upsert({
           where: {
             userId_platform: {
@@ -146,6 +168,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             accessToken: account.access_token,
             refreshToken: account.refresh_token,
             verified: true,
+            scanData: scanData || undefined,
+            lastScanned: scanData ? new Date() : undefined,
           },
           create: {
             userId: dbUser.id,
@@ -155,6 +179,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             accessToken: account.access_token,
             refreshToken: account.refresh_token,
             verified: true,
+            scanData: scanData || undefined,
+            lastScanned: scanData ? new Date() : undefined,
           },
         });
       }

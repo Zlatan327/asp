@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const readinessItems = [
-  'Clear ASP category: Software Utility for freelancer operations',
+  'Clear SkillMint category: Software Utility for freelancer operations',
   'Single user promise: turn a messy freelance brief into matched talent, tasks, escrow, and reputation',
   'Live production deployment with health endpoint',
   'Demo path works without explaining internal implementation details',
@@ -44,9 +44,9 @@ const demoSteps = [
   },
 ];
 
-const xPost = `Built KLOP for the #OKXAI Genesis Hackathon.
+const xPost = `Built SkillMint for the #OKXAI Genesis Hackathon.
 
-KLOP is an Agent Service Provider for freelance work: AI scopes gigs, generates proposals/tasks, and uses X Layer escrow plus reputation SBTs so clients and indie builders can work with less trust friction.
+SkillMint is an AI-powered marketplace for freelance work: AI scopes gigs, generates proposals/tasks, and uses X Layer escrow plus reputation SBTs so clients and indie builders can work with less trust friction.
 
 Demo: [production URL]`;
 
@@ -76,7 +76,7 @@ export default function OKXAISubmissionPage() {
                 marginBottom: 'var(--space-6)',
               }}
             >
-              KLOP is an ASP for trust-minimized freelance work.
+              SkillMint is an AI-powered marketplace for trust-minimized freelance work.
             </h1>
             <p
               style={{
@@ -104,7 +104,7 @@ export default function OKXAISubmissionPage() {
 
           <div className="card" style={{ padding: 'var(--space-6)', borderRadius: 'var(--radius-lg)' }}>
             <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
-              <SignalRow icon={<Bot size={20} />} label="ASP category" value="Software Utility" />
+              <SignalRow icon={<Bot size={20} />} label="SkillMint category" value="Software Utility" />
               <SignalRow icon={<WalletCards size={20} />} label="Settlement rail" value="X Layer escrow" />
               <SignalRow icon={<ShieldCheck size={20} />} label="Trust primitive" value="Reputation SBT" />
               <SignalRow icon={<CircleDollarSign size={20} />} label="Revenue path" value="Per-gig service fee" />
@@ -177,7 +177,7 @@ export default function OKXAISubmissionPage() {
               <li>Show posting or browsing a gig, then the AI-assisted workflow.</li>
               <li>Open the workspace task board and explain agent-generated milestones.</li>
               <li>Show the escrow panel and X Layer payment/reputation loop.</li>
-              <li>Close on OKX.AI value: a monetizable ASP for real-world work.</li>
+              <li>Close on OKX.AI value: a monetizable AI marketplace for real-world work.</li>
             </ol>
           </div>
         </section>

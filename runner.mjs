@@ -9,18 +9,11 @@ const baseUrl = (
 
 const services = [
   {
-    serviceName: "SkillMint Health Check",
-    serviceDescription: "Provides real-time uptime and readiness status for the SkillMint freelancer marketplace agent.\n1. No inputs required (HTTP GET).",
+    serviceName: "Node Health Check",
+    serviceDescription: "Provides real-time uptime and readiness status for the SkillMint commerce agent.\n1. No inputs required (HTTP GET).",
     serviceType: "A2MCP",
     fee: "0",
-    endpoint: `${baseUrl}/api/health`
-  },
-  {
-    serviceName: "SkillMint Scout Parse",
-    serviceDescription: "Parses a CV or public freelancer footprint and returns a structured Scout Agent credibility profile.\n1. Send JSON, text, or multipart form data with cv/cvText/socials/socialScans.",
-    serviceType: "A2MCP",
-    fee: "0",
-    endpoint: `${baseUrl}/api/v1/scout/parse`
+    endpoint: "https://skillmint.vercel.app/api/health"
   },
   {
     serviceName: "SkillMint Gig Drafting",
@@ -32,9 +25,9 @@ const services = [
 const args = [
   'agent',
   'create',
-  '--role', 'asp',
+  '--role', 'skillmint',
   '--name', 'SkillMint',
-  '--description', 'An autonomous freelancer marketplace agent that verifies skills, drafts gigs, matches talent, and supports trust-minimized escrow workflows.',
+  '--description', 'An autonomous B2B commerce agent that sources leads, negotiates enterprise contracts, and manages trustless Web3 escrow for global agencies.',
   '--picture', 'https://static.okx.com/cdn/web3/wallet/marketplace/headimages/agent/avatar/d60210d0-8d84-4220-9764-04e370491769.png',
   '--service', JSON.stringify(services)
 ];

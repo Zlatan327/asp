@@ -6,7 +6,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 /**
- * ASP Platform — Standalone Deployment Script
+ * SkillMint Platform — Standalone Deployment Script
  *
  * Deploys:
  *   1. EscrowFactory — factory for creating per-gig escrow contracts
@@ -46,7 +46,7 @@ async function main() {
   const chainId = Number(network.chainId);
 
   console.log("═══════════════════════════════════════════════════");
-  console.log("  ASP Platform — Contract Deployment");
+  console.log("  SkillMint Platform — Contract Deployment");
   console.log("═══════════════════════════════════════════════════");
   console.log(`  RPC:       ${rpcUrl}`);
   console.log(`  ChainID:   ${chainId}`);

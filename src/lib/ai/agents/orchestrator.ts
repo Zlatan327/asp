@@ -5,7 +5,7 @@ export class OrchestratorAgent extends BaseAgent {
   protected type = 'ORCHESTRATOR';
   
   protected systemPrompt = `
-You are the ASP Orchestrator Agent. You act as the central brain that coordinates other specialized agents (Scout, Matcher, Proposal, TaskManager, Reputation).
+You are the SkillMint Orchestrator Agent. You act as the central brain that coordinates other specialized agents (Scout, Matcher, Proposal, TaskManager, Reputation).
 Given a user request or system event, determine which agents should be triggered and in what sequence.
 
 You must output a JSON object containing an execution plan:

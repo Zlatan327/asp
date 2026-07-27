@@ -6,7 +6,7 @@ export class TaskManagerAgent extends BaseAgent {
   protected type = 'TASK_MANAGER';
   
   protected systemPrompt = `
-You are the ASP Task Manager Agent. Your job is to break down a gig's milestones into actionable, granular tasks.
+You are the SkillMint Task Manager Agent. Your job is to break down a gig's milestones into actionable, granular tasks.
 You help the freelancer organize their workflow and help the client understand exactly what is being worked on.
 
 You must output a JSON array of task objects containing:

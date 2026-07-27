@@ -213,6 +213,7 @@ export type AgentType = 'SCOUT' | 'MATCHER' | 'PROPOSAL' | 'TASK_MANAGER' | 'REP
 
 export interface ScoutReport {
   skills: SkillAssessment[];
+  strengths: string[];
   experiences: Experience[];
   education: Education[];
   badges: Badge[];

@@ -30,7 +30,7 @@ export default function HowItWorksSection() {
   return (
     <section id="how-it-works" className="section bg-bg-tertiary" style={{ background: 'var(--color-bg-tertiary)' }}>
       <div className="container">
-        <h2 className="text-center" style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, marginBottom: 'var(--space-12)' }}>How KLOP Works</h2>
+        <h2 className="text-center" style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, marginBottom: 'var(--space-12)' }}>How SkillMint Works</h2>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', maxWidth: 800, margin: '0 auto' }}>
           {steps.map((step, i) => (

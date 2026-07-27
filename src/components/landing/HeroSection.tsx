@@ -24,7 +24,7 @@ export default function HeroSection() {
         </h1>
 
         <p className="animate-fade-in-up delay-2" style={{ fontSize: 'var(--text-xl)', color: 'var(--color-text-secondary)', maxWidth: 700, margin: '0 auto var(--space-8)', lineHeight: 1.6 }}>
-          KLOP connects elite indie tech talent with ambitious clients using intelligent AI orchestration, smart contract escrow, and immutable on-chain reputation.
+          SkillMint connects elite indie tech talent with ambitious clients using intelligent AI orchestration, smart contract escrow, and immutable on-chain reputation.
         </p>
 
         <div className="animate-fade-in-up delay-3" style={{ display: 'flex', gap: 'var(--space-4)', justifyContent: 'center', flexWrap: 'wrap' }}>
