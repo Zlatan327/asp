@@ -1,5 +1,12 @@
 import { spawnSync } from 'child_process';
 
+const baseUrl = (
+  process.env.SKILLMINT_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  process.env.NEXTAUTH_URL ||
+  'https://skillmint.xyz'
+).replace(/\/$/, '');
+
 const services = [
   {
     serviceName: "Node Health Check",
@@ -9,8 +16,8 @@ const services = [
     endpoint: "https://skillmint.vercel.app/api/health"
   },
   {
-    serviceName: "B2B Contract Negotiation",
-    serviceDescription: "Autonomous negotiation of enterprise deals and management of Web3 escrow.\n1. Target agency domain, 2. Desired contract budget.",
+    serviceName: "SkillMint Gig Drafting",
+    serviceDescription: "Turns a client's project brief into a clean freelance gig draft with milestones, budget guidance, and required skills.\n1. Project title or idea, 2. Desired budget and timeline.",
     serviceType: "A2A"
   }
 ];

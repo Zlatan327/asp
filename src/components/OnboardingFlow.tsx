@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signIn } from 'next-auth/react';
 import { Bot, UploadCloud, Building2, UserCircle2, Loader2, Link as LinkIcon, Award } from 'lucide-react';
@@ -109,7 +109,12 @@ export default function OnboardingFlow() {
 
             <button
               disabled={!role}
-              onClick={() => setStep(2)}
+              onClick={() => {
+                if (role) {
+                  persistOnboardingState(role, '2');
+                }
+                setStep(2);
+              }}
               className="btn btn-primary btn-lg w-full"
             >
               Continue
@@ -141,11 +146,11 @@ export default function OnboardingFlow() {
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>Upload CV (PDF)</label>
+                    <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>Upload CV (PDF/Word)</label>
                     <div className="card" style={{ padding: 'var(--space-4)', borderStyle: 'dashed', textAlign: 'center' }}>
                       <input
                         type="file"
-                      accept=".pdf,.doc,.docx"
+                        accept=".pdf,.doc,.docx"
                         id="cv-upload"
                         onChange={(e) => setCvFile(e.target.files?.[0] || null)}
                         style={{ display: 'none' }}
@@ -162,12 +167,47 @@ export default function OnboardingFlow() {
                   <div>
                     <label style={{ display: 'block', marginBottom: 'var(--space-2)', fontWeight: 600 }}>Social Connections</label>
                     <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
-                      <button type="button" className="btn btn-secondary" style={{ flex: 1, display: 'flex', gap: 'var(--space-2)' }} onClick={() => signIn('github', { callbackUrl: '/onboarding' })}>
-                        <LinkIcon size={18} /> GitHub
-                      </button>
-                      <button type="button" className="btn btn-secondary" style={{ flex: 1, display: 'flex', gap: 'var(--space-2)' }} onClick={() => signIn('twitter', { callbackUrl: '/onboarding' })}>
-                        <LinkIcon size={18} /> X (Twitter)
-                      </button>
+                      {socialProviders.map((provider) => {
+                        const connected = connectedByPlatform.get(provider.platform);
+                        const isConnected = Boolean(connected);
+                        return (
+                          <button
+                            key={provider.id}
+                            type="button"
+                            className="btn btn-secondary"
+                            disabled={isConnected || socialsLoading}
+                            style={{
+                              flex: 1,
+                              display: 'flex',
+                              gap: 'var(--space-2)',
+                              justifyContent: 'center',
+                              opacity: isConnected ? 0.55 : 1,
+                              cursor: isConnected ? 'not-allowed' : 'pointer',
+                              background: isConnected ? 'rgba(255,255,255,0.05)' : undefined,
+                              borderColor: isConnected ? 'var(--color-border-subtle)' : undefined,
+                            }}
+                            onClick={() => {
+                              if (!isConnected) {
+                                const selectedRole = role || 'FREELANCER';
+                                persistOnboardingState(selectedRole, '2');
+                                signIn(provider.id, {
+                                  callbackUrl: `/onboarding?step=footprint&role=${selectedRole}`,
+                                });
+                              }
+                            }}
+                          >
+                            {isConnected ? <CheckCircle2 size={18} /> : <LinkIcon size={18} />}
+                            <span style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2, alignItems: 'center' }}>
+                              <span>{isConnected ? 'Connected' : provider.label}</span>
+                              {isConnected && (
+                                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', marginTop: 2 }}>
+                                  @{connected?.handle || provider.label}
+                                </span>
+                              )}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -193,7 +233,16 @@ export default function OnboardingFlow() {
               )}
 
               <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
-                <button type="button" className="btn btn-secondary" onClick={() => setStep(1)} style={{ flex: 1 }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    window.sessionStorage.removeItem(ONBOARDING_STEP_KEY);
+                    window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+                    setStep(1);
+                  }}
+                  style={{ flex: 1 }}
+                >
                   Back
                 </button>
                 <button type="submit" className="btn btn-primary btn-lg" style={{ flex: 2 }}>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, CheckCircle, Zap, Shield, Loader2, Coins } from "lucide-react";
+import { Bot, Zap, Shield, Loader2, Coins } from "lucide-react";
 import ZkVerificationModal from "@/components/ZkVerificationModal";
 import { ethers } from "ethers";
 import { getProvider, USDT_ADDRESS } from "@/lib/blockchain/contracts";
 import { TEST_USDT_ABI } from "@/lib/blockchain/config";
 
-export default function BountyClient({ initialBounties, userId, botUnlocked, rentedBot: initialRentedBot, srs, tasksCompleted, hasTwitter, hasDiscord }: any) {
+export default function BountyClient({ initialBounties, botUnlocked, rentedBot: initialRentedBot, srs, tasksCompleted, hasTwitter, hasDiscord }: any) {
   const [bounties, setBounties] = useState(initialBounties);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [targetUrl, setTargetUrl] = useState("");
@@ -90,7 +90,7 @@ export default function BountyClient({ initialBounties, userId, botUnlocked, ren
         const error = await res.json();
         alert(`Failed: ${error.error}`);
       }
-    } catch (e) {
+    } catch {
       alert("Error claiming bounty");
     } finally {
       setClaiming(null);
@@ -120,76 +120,76 @@ export default function BountyClient({ initialBounties, userId, botUnlocked, ren
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div style={{ minHeight: '100vh', padding: 'var(--space-8)' }}>
+      <div style={{ maxWidth: 1180, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-8)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--space-6)', flexWrap: 'wrap' }}>
           <div>
-            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+            <div className="badge badge-success" style={{ marginBottom: 'var(--space-3)' }}>
+              <Zap size={14} />
+              Social Proof Rewards
+            </div>
+            <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>
               Social Bounty Hub
             </h1>
-            <p className="text-white/60 mt-2">Complete micro-tasks. Verify via ZK-Proofs. Earn instant USDT.</p>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+              Complete micro-tasks. Verify via ZK proofs. Earn instant USDT.
+            </p>
           </div>
 
-          {/* User Stats & Bot Toggle */}
-          <div className="flex items-center gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
-            <div className="flex flex-col">
-              <span className="text-xs text-white/50">Your SRS</span>
-              <span className="font-mono text-emerald-400">{srs}/100</span>
+          <div className="glass-card" style={{ padding: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: 4 }}>Your SRS</div>
+              <div style={{ fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-success)' }}>{srs}/100</div>
             </div>
-            <div className="w-px h-8 bg-white/10"></div>
-            <div className="flex flex-col">
-              <span className="text-xs text-white/50">Tasks</span>
-              <span className="font-mono text-cyan-400">{tasksCompleted}</span>
+            <div style={{ width: 1, height: 36, background: 'var(--color-border-subtle)' }} />
+            <div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', textTransform: 'uppercase', marginBottom: 4 }}>Tasks</div>
+              <div style={{ fontSize: 'var(--text-lg)', fontWeight: 800 }}>{tasksCompleted}</div>
             </div>
-            <div className="w-px h-8 bg-white/10"></div>
             <button 
               onClick={handleBotToggle}
               disabled={renting}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                autoBotActive ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/50" 
-                : botUnlocked || rentedBot ? "bg-white/10 hover:bg-white/20 text-white" 
-                : "bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/60"
-              }`}
+              className={autoBotActive ? 'btn btn-primary' : 'btn btn-secondary'}
+              style={{ whiteSpace: 'nowrap' }}
             >
-              {renting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bot className="w-4 h-4" />}
+              {renting ? <Loader2 size={16} className="spin" /> : <Bot size={16} />}
               {renting ? "Processing 50 USDT..." : autoBotActive ? "Auto-Bot Active" : (botUnlocked || rentedBot) ? "Enable Auto-Bot" : "Rent Auto-Bot"}
             </button>
           </div>
         </div>
 
-        {/* Bounties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-3" style={{ gap: 'var(--space-6)' }}>
           {bounties.map((bounty: any) => (
-            <div key={bounty.id} className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col hover:border-emerald-500/30 transition-all">
-              <div className="flex items-start justify-between mb-4">
-                <div className="bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2 py-1 rounded">
-                  {bounty.platform} • {bounty.action}
-                </div>
-                <div className="flex items-center gap-1 text-emerald-400 font-mono">
-                  <Coins className="w-4 h-4" />
+            <div key={bounty.id} className="card card-interactive" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 'var(--space-3)' }}>
+                <span className="badge badge-success">{bounty.platform} · {bounty.action}</span>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--color-success)', fontWeight: 800 }}>
+                  <Coins size={16} />
                   {bounty.rewardAmount} USDT
                 </div>
               </div>
               
-              <h3 className="font-semibold text-lg mb-2">{bounty.title}</h3>
-              <p className="text-white/60 text-sm mb-6 flex-grow">{bounty.description}</p>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>{bounty.title}</h3>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)', lineHeight: 1.6 }}>{bounty.description}</p>
+              </div>
               
-              <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
-                <div className="text-xs text-white/40">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--space-3)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-border-subtle)' }}>
+                <div style={{ color: 'var(--color-text-tertiary)', fontSize: 'var(--text-xs)' }}>
                   {bounty.participantsCount} / {bounty.maxParticipants} Claimed
                 </div>
                 <button 
                   onClick={() => handleVerifyClick(bounty)}
                   disabled={claiming === bounty.id || autoBotActive}
-                  className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50"
+                  className="btn btn-secondary btn-sm"
+                  style={{ opacity: claiming === bounty.id || autoBotActive ? 0.6 : 1 }}
                 >
                   {claiming === bounty.id ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Verifying</>
+                    <><Loader2 size={16} className="spin" /> Verifying</>
                   ) : autoBotActive ? (
-                    <><Bot className="w-4 h-4 text-emerald-400" /> Bot Handled</>
+                    <><Bot size={16} /> Bot Handled</>
                   ) : (
-                    <><Shield className="w-4 h-4" /> ZK Verify</>
+                    <><Shield size={16} /> ZK Verify</>
                   )}
                 </button>
               </div>
@@ -198,10 +198,10 @@ export default function BountyClient({ initialBounties, userId, botUnlocked, ren
         </div>
 
         {bounties.length === 0 && (
-          <div className="text-center py-20 border border-white/5 border-dashed rounded-xl">
-            <Zap className="w-12 h-12 text-white/20 mx-auto mb-4" />
-            <h3 className="text-white/80 font-semibold">No active bounties right now</h3>
-            <p className="text-white/40 text-sm">Check back later for more micro-tasks.</p>
+          <div className="glass-card text-center" style={{ padding: 'var(--space-10)', borderStyle: 'dashed' }}>
+            <Zap size={48} style={{ color: 'var(--color-text-tertiary)', margin: '0 auto var(--space-4)' }} />
+            <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: 'var(--space-2)' }}>No active bounties right now</h3>
+            <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>Check back later for more micro-tasks.</p>
           </div>
         )}
 

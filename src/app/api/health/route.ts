@@ -5,7 +5,12 @@ export async function GET() {
     {
       status: "healthy",
       timestamp: new Date().toISOString(),
-      agent: "Agentic Service Provider",
+      agent: "SkillMint Agent Service Provider",
+      service: "SkillMint",
+      endpoints: {
+        scoutParse: "/api/v1/scout/parse",
+        publicScoutParse: "/v1/scout/parse",
+      },
     },
     { status: 200 }
   );
